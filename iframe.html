@@ -73,7 +73,7 @@
                             currentHash = newHash;
 
                             const otherUrl = new URL(otherIframe.src);
-                            otherIframe.src = otherUrl.pathname + newHash;
+                            otherIframe.src = otherUrl.pathname + otherUrl.search + newHash;
                         }
                     } catch (e) {
                         // Handle potential security exceptions when accessing iframe content
