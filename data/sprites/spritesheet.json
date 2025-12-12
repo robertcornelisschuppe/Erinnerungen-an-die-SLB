@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "type": "sharpsheet",
+    "version": "1",
+    "app": "https://github.com/cpietsch/sharpsheet"
+  },
+  "spritesheets": [
+    {
+      "image": "sprite-1024-0.jpg",
+      "sprites": [
+        {
+          "name": "Dresden_1890",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "dimension": {
+            "w": 128,
+            "h": 94
+          }
+        },
+        {
+          "name": "Dresden_1572",
+          "position": {
+            "x": 131,
+            "y": 1
+          },
+          "dimension": {
+            "w": 128,
+            "h": 48
+          }
+        },
+        {
+          "name": "Dresden_2020",
+          "position": {
+            "x": 261,
+            "y": 1
+          },
+          "dimension": {
+            "w": 128,
+            "h": 32
+          }
+        }
+      ]
+    }
+  ]
+}
