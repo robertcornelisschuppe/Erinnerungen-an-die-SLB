@@ -6,7 +6,7 @@
   "loader": {
     "info": "https://github.com/robertcornelisschuppe/vikus-viewer-dresden/blob/main/info.md",
     "timeline": "https://github.com/robertcornelisschuppe/vikus-viewer-dresden/blob/main/timeline.csv",
-    "items": "https://vikusviewer.fh-potsdam.de/data/vangogh/data.csv",
+    "items": "https://github.com/robertcornelisschuppe/vikus-viewer-dresden/blob/main/data.csv",
     "layouts": [
         {
             "title": "Time"
