@@ -24,11 +24,11 @@
       },
       "detail": {
         "size": 1024,
-        "url": "data/1024"
+        "url": "data/1024/"
       },
       "big": {
         "size": 4096,
-        "url": "data/4096"
+        "url": "data/4096/"
       }
     }
   },
