@@ -24,11 +24,13 @@
       },
       "detail": {
         "size": 1024,
-        "url": "data/1024/"
+        "url": "data/1024",
+        "format": "tiled"
       },
       "big": {
         "size": 4096,
-        "url": "data/4096/"
+        "url": "data/4096",
+        "format": "tiled"
       }
     }
   },
