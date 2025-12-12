@@ -1,5 +1,6 @@
-keywords,year,_time,_description,id
-Barock,1572,1572,Dresden in der Barock-Zeit,Dresden_1572
-Wilhelminisch,1890,1890,Dresden im späten 19. Jahrhundert,Dresden_1890
-Nacht,2020,2020,Modernes Dresden bei Nacht,Dresden_2020
+keywords,year,_time,_description,id,media_link
+Barock,1572,1572,Dresden in der Barock-Zeit,Dresden_1572, https://www.youtube.com/watch?v=N60wQexouyY&list=RDN60wQexouyY&start_radio=1
+Wilhelminisch,1890,1890,Dresden im späten 19. Jahrhundert,Dresden_1890, https://www.youtube.com/watch?v=3jX3OytaVLM&list=RD3jX3OytaVLM&start_radio=1
+Nacht,2020,2020,Modernes Dresden bei Nacht,Dresden_2020, _blank_
+
 
