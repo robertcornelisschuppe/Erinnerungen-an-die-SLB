@@ -114,6 +114,7 @@ function Canvas() {
   var timelineHover = false;
   var tsneIndex = {};
   var tsneScale = {}
+  var mediaPlayerContainer;
 
   function canvas() { }
 
@@ -269,6 +270,59 @@ function Canvas() {
     canvas.removeAllVectors();
     canvas.removeAllBorders();
   }
+
+canvas.clearMedia = function () {
+    if (mediaPlayerContainer) {
+        // Clearing the HTML stops playback
+        mediaPlayerContainer.html("");
+        mediaPlayerContainer.style("display", "none");
+    }
+};
+
+canvas.loadMedia = function (d) {
+    var link = d.media_link;
+    if (!link) {
+        canvas.clearMedia();
+        return;
+    }
+
+    var iframeHtml = "";
+
+    // 1. YouTube embedding (uses iframe with autoplay=1)
+    if (link.includes("youtube.com") || link.includes("youtu.be")) {
+        var videoId = "";
+        if (link.includes("youtu.be/")) {
+            // Short URL: youtu.be/VIDEO_ID
+            videoId = link.split("youtu.be/")[1].split(/[?&]/)[0];
+        } else if (link.includes("v=")) {
+            // Regular URL: watch?v=VIDEO_ID
+            videoId = link.split("v=")[1].split(/[?&]/)[0];
+        }
+        if (videoId) {
+            iframeHtml = '<iframe class="media-iframe" src="https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0&showinfo=0&controls=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+        }
+    } 
+    // 2. SoundCloud embedding (assumes user provides the embed player URL)
+    else if (link.includes("soundcloud.com/player/")) {
+        // Appends autoplay parameter
+        iframeHtml = '<iframe class="media-iframe" scrolling="no" frameborder="no" allow="autoplay" src="' + link + '&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true"></iframe>';
+    } 
+    // 3. Generic HTML5 Video (e.g., local .mp4, .webm)
+    else if (link.match(/\.(mp4|ogg|webm)$/i)) {
+        iframeHtml = '<video width="100%" height="200px" controls autoplay><source src="' + link + '" type="video/mp4">Your browser does not support the video tag.</video>';
+    } 
+    // 4. Generic HTML5 Audio (e.g., local .mp3, .wav)
+    else if (link.match(/\.(mp3|wav|ogg)$/i)) {
+        iframeHtml = '<audio controls autoplay style="width:100%;"><source src="' + link + '" type="audio/mpeg">Your browser does not support the audio element.</audio>';
+    }
+
+    if (iframeHtml) {
+        mediaPlayerContainer.html(iframeHtml);
+        mediaPlayerContainer.style("display", "block");
+    } else {
+        canvas.clearMedia();
+    }
+};
 
   canvas.getView = function () {
     var visibleItems = [];
@@ -547,6 +601,10 @@ function Canvas() {
     container = d3.select(".page").append("div").classed("viz", true);
     detailVue._data.structure = config.detail.structure;
 
+    var detailInner = d3.select(".sidebar .inner");
+    mediaPlayerContainer = detailInner.append("div")
+        .classed("media-player-container", true);   
+    
     columns = config.projection.columns;
     imageSize = config.loader.textures.medium.size;
     imageSize2 = config.loader.textures.detail.size;
@@ -1176,7 +1234,12 @@ function Canvas() {
     detailVue.id = d.id;
     detailVue.page = d.page;
     detailVue.item = detailData;
-  }
+
+    canvas.clearMedia(); // Clear any existing player first
+    if (d.media_link) {
+        canvas.loadMedia(d);
+    }
+}
 
   canvas.showDetail = showDetail;
 
@@ -1588,6 +1651,7 @@ function Canvas() {
 
   canvas.resetZoom = function (callback) {
     var duration = scale > 1 ? 1000 : 100;
+    canvas.clearMedia();
 
     extent = d3.extent(data, function (d) {
       return d.y;
