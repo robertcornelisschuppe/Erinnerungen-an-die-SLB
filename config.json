@@ -14,7 +14,7 @@
         {
             "title": "Similarity",
             "url": "tsne.csv",
-            "scale": 1
+            "scale": 2
         }
     ],
     "textures": {
