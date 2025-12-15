@@ -99,6 +99,10 @@
     /*stroke: #000;*/
 }
 
+.infobar.sneak .infobutton {
+    right: -50px;
+}
+
 .navi.hide {
     display: none;
 }
