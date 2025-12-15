@@ -101,7 +101,7 @@
 
 .infobar.sneak .infobutton {
     right: -50px;
-    left: 20%;
+    left: 10%;
     transform: rotate(180deg);
 }
 
