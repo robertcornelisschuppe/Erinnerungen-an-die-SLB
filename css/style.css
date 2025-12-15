@@ -676,7 +676,7 @@ svg {
     transform: rotate(180deg);
 }
 .detail.hide {
-  right: -600px !important;
+  right: -1000px !important;
 }
 
 .detail {
@@ -692,7 +692,7 @@ svg {
     /* top: 20px; */
     right: 0px;
     position: absolute;
-    width: 520px;
+    width: 900px;
     color: #2D2D2D;
     background: rgb(255, 254, 250);
     /* background: url("img/koenigspapier.png"); */
