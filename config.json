@@ -7,6 +7,11 @@
     "info": "info.md",
     "timeline": "timeline.csv",
     "items": "data.csv",
+    "layouts": [
+      {
+        "title": "Time"
+      }
+    ],
     "textures": {
       "medium": {
         "size": 256,
