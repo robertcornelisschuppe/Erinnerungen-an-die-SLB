@@ -1174,7 +1174,7 @@ canvas.loadMedia = function (d) {
     var scale = 1 / (rangeBandImage / (max * 0.6));
     var visibleCenter = (width - 700) / 2;
     var translateNow = [
-      visibleCenter - scale * (d.x - padding) + margin.left,
+      visibleCenter - scale * (d.x + padding) + margin.left,
       -scale * (height + d.y + padding) - margin.top + height / 2,
     ];
 
