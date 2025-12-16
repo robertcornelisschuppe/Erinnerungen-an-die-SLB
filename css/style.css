@@ -670,13 +670,13 @@ svg {
 
 
 .detail.sneak {
-    right: -460px;
+    right: -700px;
 }
 .detail.sneak .slidebutton {
     transform: rotate(180deg);
 }
 .detail.hide {
-  right: -600px !important;
+  right: -720px !important;
 }
 
 .detail {
@@ -1018,22 +1018,15 @@ textarea:focus, input:focus{
 }
 
 .detail .media-player-container {
-    /* Die vorhandenen Zeilen belassen */
     padding: 15px 0 0; 
     max-width: 100%;
     margin: 0 auto;
-    /* This makes the iframe responsive */
     position: relative;
     height: 0;
-    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    padding-bottom: 56.25%;
     overflow: hidden;
-
-    /* HINZUFÜGEN ODER ÄNDERN SIE DIESE ZEILEN */
-    /* Nutzen Sie die volle Breite des .detail-Containers und heben Sie das 20px Padding links/rechts auf */
-    width: calc(100% + 40px); /* 100% (von .inner) + 2x 20px Padding */
-    margin-left: -20px; /* Verschiebt das Element 20px nach links */
-    
-    /* optional: */
+    width: calc(100% + 120px);
+    margin-left: -60px;
     max-width: none;
 }
 
