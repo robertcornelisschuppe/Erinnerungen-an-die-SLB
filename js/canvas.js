@@ -906,7 +906,7 @@ canvas.resize = function () {
     });
   };
 
-  function mousemove(d) {
+function mousemove(d) {
     if (timelineHover) return;
 
     var mouse = d3.mouse(vizContainer.node());
@@ -925,29 +925,28 @@ canvas.resize = function () {
     );
 
     selectedImageDistance = best && best.d || 1000;
-    // console.log(cursorCutoff, scale, scale1, selectedImageDistance)
 
-    // if (best.p && selectedImageDistance > 7) {
-    //   //selectedImage = null;
-    //   //zoom.center(null);
-    //   container.style("cursor", "default");
-    // } else {
     if (best && best.p && !zoomedToImage) {
       var d = best.p;
       var center = [
         (d.x + imgPadding) * scale + translate[0],
         (height + d.y + imgPadding) * scale + translate[1],
       ];
-      // console.log("center", width, center, d.x, d.y)
       zoom.center(center);
       selectedImage = d;
     }
 
+    // --- FIX: Logic for the Hand Cursor ---
     container.style("cursor", function () {
-      return selectedImageDistance < cursorCutoff && selectedImage.active
-        ? "pointer"
-        : "default";
+      // 1. Check if we are close enough
+      var isClose = selectedImageDistance < cursorCutoff;
+      
+      // 2. Check if image is active (treat 'undefined' as true to be safe)
+      var isActive = selectedImage && (selectedImage.active !== false);
+
+      return isClose && isActive ? "pointer" : "default";
     });
+    // ---------------------------------------
 
     if (d3.event.shiftKey) {
       container.style("cursor", "copy")
@@ -958,9 +957,8 @@ canvas.resize = function () {
         container.style("cursor", "cell")
       }
     }
-    // }
   }
-
+  
   function stackLayout(data, invert) {
     var groupKey = state.mode.groupKey
     var years = d3
