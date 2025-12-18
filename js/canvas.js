@@ -936,17 +936,17 @@ function mousemove(d) {
       selectedImage = d;
     }
 
-    // --- FIX: Logic for the Hand Cursor ---
+    // --- FIX: Allow cursor to appear if 'active' is undefined ---
     container.style("cursor", function () {
-      // 1. Check if we are close enough
+      // Check if we are close enough to an image
       var isClose = selectedImageDistance < cursorCutoff;
       
-      // 2. Check if image is active (treat 'undefined' as true to be safe)
-      var isActive = selectedImage && (selectedImage.active !== false);
+      // Check if the image is active OR if 'active' status is missing (default to true)
+      var isActive = selectedImage && (selectedImage.active === undefined || selectedImage.active);
 
       return isClose && isActive ? "pointer" : "default";
     });
-    // ---------------------------------------
+    // ------------------------------------------------------------
 
     if (d3.event.shiftKey) {
       container.style("cursor", "copy")
