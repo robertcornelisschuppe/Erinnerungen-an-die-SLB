@@ -506,8 +506,15 @@ canvas.loadMedia = function (d) {
   canvas.x = x;
   canvas.y = yscale;
 
-  canvas.resize = function () {
+canvas.resize = function () {
+    // 1. NEW: Check if we are in fullscreen mode. 
+    // If a video is fullscreen, do NOT reset the canvas!
+    if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+        return;
+    }
+
     if (!state.init) return;
+    
     width = window.innerWidth - margin.left - margin.right;
     height = window.innerHeight // < minHeight ? minHeight : window.innerHeight;
     widthOuter = window.innerWidth;
@@ -515,9 +522,12 @@ canvas.loadMedia = function (d) {
     zoom.size([width, height]);
     canvas.makeScales();
     canvas.project();
-    canvas.resetZoom();
-    console.log("dimensions", width, height)
-    console.log("self.innerWidth", self.innerWidth, self.innerHeight)
+    
+    // This was the line causing the "jump back"
+    canvas.resetZoom(); 
+    
+    console.log("dimensions", width, height);
+    console.log("self.innerWidth", self.innerWidth, self.innerHeight);
   };
 
   canvas.makeScales = function () {
