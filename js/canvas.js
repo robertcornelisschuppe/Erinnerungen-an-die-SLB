@@ -768,7 +768,7 @@ canvas.resize = function () {
         if (selectedImage && !selectedImage.id) return;
         if (drag) return;
         if (selectedImageDistance > cursorCutoff) return;
-        if (selectedImage && !selectedImage.active) return;
+        if (selectedImage && selectedImage.active === false) return;
         if (timelineHover) return;
         // console.log(selectedImage)
         userInteraction = true;
@@ -938,11 +938,10 @@ function mousemove(d) {
 
     // --- FIX: Allow cursor to appear if 'active' is undefined ---
     container.style("cursor", function () {
-      // Check if we are close enough to an image
       var isClose = selectedImageDistance < cursorCutoff;
       
-      // Check if the image is active OR if 'active' status is missing (default to true)
-      var isActive = selectedImage && (selectedImage.active === undefined || selectedImage.active);
+      // If 'active' is missing, we treat it as TRUE
+      var isActive = selectedImage && (selectedImage.active === undefined || selectedImage.active !== false);
 
       return isClose && isActive ? "pointer" : "default";
     });
