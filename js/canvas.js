@@ -324,20 +324,35 @@ canvas.loadMedia = function (d) {
         iframeHtml = '<iframe class="media-iframe" src="' + link + '" frameborder="0" allowfullscreen></iframe>';
     }
 
-    if (iframeHtml) {
+if (iframeHtml) {
         mediaPlayerContainer.html(iframeHtml);
         mediaPlayerContainer.style("display", "block");
+
+        // --- NEW: Dynamic Aspect Ratio Logic ---
+        // Read from CSV, default to "16:9" if empty
+        var ratio = d.aspect_ratio || "16:9"; 
+        var padding = "56.25%"; // Default height (16:9)
+
+        if (ratio === "4:3") {
+            padding = "75%"; // Taller height for boxy videos
+        } else if (ratio === "1:1") {
+            padding = "100%"; // Square videos
+        }
+
+        // Apply the calculated height to the player
+        mediaPlayerContainer.style("padding-bottom", padding);
+        // ---------------------------------------
+
         var player = document.getElementById('vikus-audio-player');
+        // ... (keep your existing autoplay logic below) ...
         if (player) {
-            // WICHTIG: player.play() wird durch den vorherigen Klick auf das Bild
-            // freigegeben und sollte nun MIT TON starten.
             setTimeout(function() {
                 player.play().catch(function(error) {
-                    // Falls es doch fehlschlägt, ist es ein Autoplay-Fehler
-                    console.log("Audio konnte nicht mit Ton starten. Autoplay-Blockade.", error);
+                   console.log("Audio autoplay blocked", error);
                 });
             }, 100); 
         }
+    }
     } else {
         canvas.clearMedia();
     }
