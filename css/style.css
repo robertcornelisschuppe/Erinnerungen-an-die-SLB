@@ -157,7 +157,7 @@ canvas {
   }
   12.5% {
     transform: translateX(27.5px) translateY(-57px) scale(1.1);
-    background: #F7EFCD;
+    background: #575757;
   }
   25% {
     transform: translateX(55px) translateY(0px);
