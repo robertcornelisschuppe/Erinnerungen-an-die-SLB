@@ -58,7 +58,7 @@ canvas {
   pointer-events: none;
    /* box-shadow: 0 0px 56px rgba(0, 0, 0, 0.66), 0 0px 6px rgba(0, 0, 0, 0.23); */
    opacity: 1;
-   color: #CCCBC8;
+   color: #EDE8E8;
    z-index: 100;
    position: absolute;
    right: 0;
