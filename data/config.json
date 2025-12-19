@@ -30,13 +30,13 @@
     }
   },
   "style": {
-    "fontColor": "#2d3b43",
-    "fontColorActive": "#eae2cb",
+    "fontColor": "#fafafa",
+    "fontColorActive": "#fff",
     "fontBackground": "#295b71",
-    "textShadow": "1px 1px 0px #f8f4e9",
+    "textShadow": "1px 1px 0px #454545",
     "canvasBackground": "#eae2cb",
     "timelineBackground": "#454545",
-    "timelineFontColor": "#fff",
+    "timelineFontColor": "#fafafa",
     "backgroundHeader": "#035151",
     "fontColorHeader": "#f8774f",
     "detailBackground": "#EEE",
