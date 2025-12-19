@@ -652,17 +652,20 @@ canvas.resize = function () {
     //   16
     // );
 
-    var renderOptions = {
+var renderOptions = {
       resolution: resolution,
       antialiasing: true,
+      transparent: true,  // <--- NEW: Allows CSS background to show through!
       width: width + margin.left + margin.right,
       height: height,
     };
     renderer = new PIXI.Renderer(renderOptions);
-    renderer.backgroundColor = parseInt(
-      config.style.canvasBackground.substring(1),
-      16
-    );
+    
+    // renderer.backgroundColor = parseInt(
+    //   config.style.canvasBackground.substring(1),
+    //   16
+    // );
+    
     window.renderer = renderer;
 
     var renderElem = d3.select(container.node().appendChild(renderer.view));
