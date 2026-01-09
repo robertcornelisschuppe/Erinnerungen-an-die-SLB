@@ -1,9 +1,10 @@
 keywords,year,_time,_description,id,media_link,aspect_ratio,active
-Barock,1950er Jahre,1950er Jahre,Dresden in der Barock-Zeit,Dresden_1572, https://www.youtube.com/watch?v=N60wQexouyY&list=RDN60wQexouyY&start_radio=1,16:9,true
-Wilhelminisch,1960er Jahre,1960er Jahre,Dresden im späten 19. Jahrhundert,Dresden_1890,https://media.slub-dresden.de/vid/fk/x/000051/vid_fk_x_000051_01.mp4,4:3,true
-Nacht,1970er Jahre,1970er Jahre,Modernes Dresden bei Nacht,Dresden_2020,https://media.slub-dresden.de/vid/fk/x/004731/vid_fk_x_004731_01.mp4,4:3,true
-Wilhelminisch,1980er Jahre,1980er Jahre,Dresden im späten 19. Jahrhundert,Dresden_1890,https://media.slub-dresden.de/vid/fk/x/000051/vid_fk_x_000051_01.mp4,4:3,true
-Nacht,1990er Jahre,1990er Jahre,Modernes Dresden bei Nacht,Dresden_2020,https://media.slub-dresden.de/vid/fk/x/004731/vid_fk_x_004731_01.mp4,4:3,true
+Barock,1950er Jahre,1950,Dresden in der Barock-Zeit,Dresden_1572, https://www.youtube.com/watch?v=N60wQexouyY&list=RDN60wQexouyY&start_radio=1,16:9,true
+Wilhelminisch,1960,1960er Jahre,Dresden im späten 19. Jahrhundert,Dresden_1890,https://media.slub-dresden.de/vid/fk/x/000051/vid_fk_x_000051_01.mp4,4:3,true
+Nacht,1970,1970er Jahre,Modernes Dresden bei Nacht,Dresden_2020,https://media.slub-dresden.de/vid/fk/x/004731/vid_fk_x_004731_01.mp4,4:3,true
+Wilhelminisch,1980,1980er Jahre,Dresden im späten 19. Jahrhundert,Dresden_1890,https://media.slub-dresden.de/vid/fk/x/000051/vid_fk_x_000051_01.mp4,4:3,true
+Nacht,1990er Jahre,1990,Modernes Dresden bei Nacht,Dresden_2020,https://media.slub-dresden.de/vid/fk/x/004731/vid_fk_x_004731_01.mp4,4:3,true
+
 
 
 
