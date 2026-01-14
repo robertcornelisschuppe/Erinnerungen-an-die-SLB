@@ -50,27 +50,26 @@
   "detail": {
     "structure": [      
       {
-        "name": "Description",
+        "name": "Inhalt",
         "source": "_description",
         "display": "column",
         "type": "text"
       },
       {
-        "name": "Year",
+        "name": "Dekade",
         "source": "_year",
         "display": "column",
         "type": "text"
       },
       {
-        "name": "Keywords",
+        "name": "Schlagwörter",
         "source": "_keywords",
         "display": "column",
         "type": "array"
       },
       {
-        "name": "Id",
-        "source": "_id",
-        "display": "column",
+        "name": "Person",
+        "source": "person",
         "type": "text"
       }
     ]
