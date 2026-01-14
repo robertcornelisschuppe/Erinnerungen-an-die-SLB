@@ -70,6 +70,7 @@
       {
         "name": "Person",
         "source": "person",
+        "display": "column",
         "type": "text"
       }
     ]
