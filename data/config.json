@@ -56,6 +56,24 @@
         "type": "text"
       },
       {
+        "name": "Person",
+        "source": "person",
+        "display": "column",
+        "type": "text"
+      },
+      {
+        "name": "Funktion",
+        "source": "role",
+        "display": "column",
+        "type": "text"
+      },
+      {
+        "name": "Aufnahmedatum",
+        "source": "record_date",
+        "display": "column",
+        "type": "text"
+      },
+      {
         "name": "Dekade",
         "source": "_year",
         "display": "column",
@@ -66,12 +84,6 @@
         "source": "_keywords",
         "display": "column",
         "type": "array"
-      },
-      {
-        "name": "Person",
-        "source": "person",
-        "display": "column",
-        "type": "text"
       }
     ]
   }
