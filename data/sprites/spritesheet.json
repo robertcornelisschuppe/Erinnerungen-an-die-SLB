@@ -9,36 +9,102 @@
       "image": "sprite-1024-0.jpg",
       "sprites": [
         {
-          "name": "Dresden_1890",
+          "name": "Renate_Ritter",
           "position": {
             "x": 1,
             "y": 1
           },
           "dimension": {
-            "w": 128,
-            "h": 94
+            "w": 88,
+            "h": 128
           }
         },
         {
-          "name": "Dresden_1572",
+          "name": "Facharbeiterzeugnis",
           "position": {
-            "x": 131,
+            "x": 91,
+            "y": 1
+          },
+          "dimension": {
+            "w": 96,
+            "h": 128
+          }
+        },
+        {
+          "name": "TU_Bibliothek",
+          "position": {
+            "x": 189,
             "y": 1
           },
           "dimension": {
             "w": 128,
-            "h": 48
+            "h": 107
           }
         },
         {
-          "name": "Dresden_2020",
+          "name": "Restaurierungswerkstatt",
           "position": {
-            "x": 261,
+            "x": 319,
             "y": 1
           },
           "dimension": {
             "w": 128,
-            "h": 32
+            "h": 100
+          }
+        },
+        {
+          "name": "Schallplattennutzung",
+          "position": {
+            "x": 449,
+            "y": 1
+          },
+          "dimension": {
+            "w": 128,
+            "h": 92
+          }
+        },
+        {
+          "name": "Restauration",
+          "position": {
+            "x": 579,
+            "y": 1
+          },
+          "dimension": {
+            "w": 128,
+            "h": 92
+          }
+        },
+        {
+          "name": "Musiklesesaal",
+          "position": {
+            "x": 709,
+            "y": 1
+          },
+          "dimension": {
+            "w": 128,
+            "h": 91
+          }
+        },
+        {
+          "name": "Lesesaal",
+          "position": {
+            "x": 839,
+            "y": 1
+          },
+          "dimension": {
+            "w": 128,
+            "h": 90
+          }
+        },
+        {
+          "name": "Ausleihe",
+          "position": {
+            "x": 1,
+            "y": 131
+          },
+          "dimension": {
+            "w": 128,
+            "h": 90
           }
         }
       ]
