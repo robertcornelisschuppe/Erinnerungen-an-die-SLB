@@ -9,20 +9,20 @@
       "image": "sprite-1024-0.jpg",
       "sprites": [
         {
-          "name": "Renate_Ritter",
+          "name": "Zeitschrift_Psychologie",
           "position": {
             "x": 1,
             "y": 1
           },
           "dimension": {
-            "w": 88,
+            "w": 85,
             "h": 128
           }
         },
         {
-          "name": "Facharbeiterzeugnis",
+          "name": "Studienplatzvergabe",
           "position": {
-            "x": 91,
+            "x": 88,
             "y": 1
           },
           "dimension": {
@@ -31,9 +31,75 @@
           }
         },
         {
-          "name": "TU_Bibliothek",
+          "name": "Renate_Ritter",
           "position": {
-            "x": 189,
+            "x": 186,
+            "y": 1
+          },
+          "dimension": {
+            "w": 88,
+            "h": 128
+          }
+        },
+        {
+          "name": "Lenin",
+          "position": {
+            "x": 276,
+            "y": 1
+          },
+          "dimension": {
+            "w": 84,
+            "h": 128
+          }
+        },
+        {
+          "name": "Dissertation_Landmann",
+          "position": {
+            "x": 362,
+            "y": 1
+          },
+          "dimension": {
+            "w": 83,
+            "h": 128
+          }
+        },
+        {
+          "name": "Burgemeister",
+          "position": {
+            "x": 447,
+            "y": 1
+          },
+          "dimension": {
+            "w": 86,
+            "h": 128
+          }
+        },
+        {
+          "name": "Bericht_Zentralkomitee",
+          "position": {
+            "x": 535,
+            "y": 1
+          },
+          "dimension": {
+            "w": 97,
+            "h": 128
+          }
+        },
+        {
+          "name": "Ausleihvermerk",
+          "position": {
+            "x": 634,
+            "y": 1
+          },
+          "dimension": {
+            "w": 87,
+            "h": 128
+          }
+        },
+        {
+          "name": "TU_Bib",
+          "position": {
+            "x": 723,
             "y": 1
           },
           "dimension": {
@@ -42,21 +108,43 @@
           }
         },
         {
-          "name": "Restaurierungswerkstatt",
+          "name": "Hochschule_für_Musik",
           "position": {
-            "x": 319,
+            "x": 853,
             "y": 1
           },
           "dimension": {
             "w": 128,
-            "h": 100
+            "h": 95
+          }
+        },
+        {
+          "name": "Übergabe_Neubau",
+          "position": {
+            "x": 1,
+            "y": 131
+          },
+          "dimension": {
+            "w": 128,
+            "h": 94
+          }
+        },
+        {
+          "name": "Palasthotel",
+          "position": {
+            "x": 131,
+            "y": 131
+          },
+          "dimension": {
+            "w": 128,
+            "h": 93
           }
         },
         {
           "name": "Schallplattennutzung",
           "position": {
-            "x": 449,
-            "y": 1
+            "x": 261,
+            "y": 131
           },
           "dimension": {
             "w": 128,
@@ -64,10 +152,21 @@
           }
         },
         {
-          "name": "Restauration",
+          "name": "Marienallee",
           "position": {
-            "x": 579,
-            "y": 1
+            "x": 391,
+            "y": 131
+          },
+          "dimension": {
+            "w": 128,
+            "h": 92
+          }
+        },
+        {
+          "name": "Ferienheim",
+          "position": {
+            "x": 521,
+            "y": 131
           },
           "dimension": {
             "w": 128,
@@ -77,8 +176,8 @@
         {
           "name": "Musiklesesaal",
           "position": {
-            "x": 709,
-            "y": 1
+            "x": 651,
+            "y": 131
           },
           "dimension": {
             "w": 128,
@@ -88,8 +187,19 @@
         {
           "name": "Lesesaal",
           "position": {
-            "x": 839,
-            "y": 1
+            "x": 781,
+            "y": 131
+          },
+          "dimension": {
+            "w": 128,
+            "h": 90
+          }
+        },
+        {
+          "name": "Dresden_zerstört",
+          "position": {
+            "x": 1,
+            "y": 227
           },
           "dimension": {
             "w": 128,
@@ -99,12 +209,45 @@
         {
           "name": "Ausleihe",
           "position": {
-            "x": 1,
-            "y": 131
+            "x": 131,
+            "y": 227
           },
           "dimension": {
             "w": 128,
             "h": 90
+          }
+        },
+        {
+          "name": "Bundesmann",
+          "position": {
+            "x": 261,
+            "y": 227
+          },
+          "dimension": {
+            "w": 128,
+            "h": 89
+          }
+        },
+        {
+          "name": "Wachsmatrize",
+          "position": {
+            "x": 391,
+            "y": 227
+          },
+          "dimension": {
+            "w": 128,
+            "h": 82
+          }
+        },
+        {
+          "name": "Bildindex_der_Kunst_und_Architektur_Logo",
+          "position": {
+            "x": 521,
+            "y": 227
+          },
+          "dimension": {
+            "w": 128,
+            "h": 44
           }
         }
       ]
