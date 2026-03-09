@@ -50,12 +50,6 @@
   "detail": {
     "structure": [      
       {
-        "name": "Inhalt",
-        "source": "_description",
-        "display": "column",
-        "type": "text"
-      },
-      {
         "name": "Person",
         "source": "person",
         "display": "column",
