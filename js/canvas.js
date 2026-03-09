@@ -1854,11 +1854,10 @@ function mousemove(d) {
     sprite._data = d;
     d.big = true;
     stage5.addChild(sprite);
-    // --- START OF DESCRIPTION TEXT CODE ---
     if (d._description) {
       var style = new PIXI.TextStyle({
         fontFamily: 'Lato, Arial, sans-serif',
-        fontSize: 50,
+        fontSize: 70,
         fill: '#ffffff',
         wordWrap: true,
         wordWrapWidth: imageSize3 * 0.8,
