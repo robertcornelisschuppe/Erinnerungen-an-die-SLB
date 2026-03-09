@@ -1166,37 +1166,32 @@ function zoomToImage(d, duration) {
     state.zoomingToImage = true;
     vizContainer.style("pointer-events", "none");
     zoom.center(null);
+    
     loadMiddleImage(d);
+    loadBigImage(d, "click"); // <--- ADD IT HERE to load during the animation
+    
     d3.select(".tagcloud").classed("hide", true);
 
     var padding = rangeBandImage / 2;
     var max = Math.max(width, height);
     var scale = 1 / (rangeBandImage / (max * 0.6));
     
+    // --- START OF ROBUST PORTRAIT FIX ---
     var imageAspectRatio = 1;
-    
-    // Get the true aspect ratio directly from the loaded PIXI texture of the thumbnail!
     if (d.sprite && d.sprite.texture && d.sprite.texture.width > 0) {
         imageAspectRatio = d.sprite.texture.height / d.sprite.texture.width;
     } else if (d.sprite && d.sprite.width > 0) {
         imageAspectRatio = d.sprite.height / d.sprite.width;
     }
-
-    // Calculate how tall the image WILL be on the screen based on the initial scale
     var screenImageHeight = (rangeBandImage * scale) * imageAspectRatio;
-    
-    // Set our limit to 75% of the browser window's height
-    var maxScreenHeight = height * 0.95; 
-    
-    // If the projected height is taller than our limit, shrink the zoom scale proportionally
+    var maxScreenHeight = height * 0.75; 
     if (screenImageHeight > maxScreenHeight) {
         scale = scale * (maxScreenHeight / screenImageHeight);
     }
+    // --- END OF ROBUST PORTRAIT FIX ---
     
     var visibleCenter = (width - 700) / 2;
 
-    // CRUCIAL: translateNow is calculated HERE, after the scale is finalized!
-    // This ensures the camera perfectly centers the portrait image.
     var translateNow = [
         visibleCenter - scale * (d.x + padding),
         height / 2 - scale * (height + d.y + padding)
@@ -1218,7 +1213,7 @@ function zoomToImage(d, duration) {
         selectedImage = d;
         hideTheRest(d);
         showDetail(d);
-        loadBigImage(d, "click");
+        // REMOVED loadBigImage FROM HERE
         state.zoomingToImage = false;
         console.log("zoomedToImage", zoomedToImage);
         vizContainer.style("pointer-events", "auto");
