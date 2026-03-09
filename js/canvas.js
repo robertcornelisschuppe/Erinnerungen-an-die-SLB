@@ -796,14 +796,37 @@ var renderOptions = {
 
     state.init = true;
 
-    window.addEventListener("keydown", function(event) {
+window.addEventListener("keydown", function(event) {
       if (event.key === "Escape" || event.keyCode === 27) {
         if (zoomedToImage) {
           event.preventDefault();
           event.stopPropagation();
           
-          // Let the native function handle the entire sequence!
+          // 1. Instantly hide the sidebar and show the tagcloud
+          d3.select(".sidebar").classed("sneak", true);
+          d3.select(".tagcloud").classed("hide", false);
+          if (canvas.clearMedia) canvas.clearMedia();
+          
+          // 2. Trigger the camera fly-out (WITHOUT changing the URL hash yet)
           canvas.resetZoom(); 
+          
+          // 3. The Tab-Safe Timer: Wait for the camera to finish (1.1 seconds), 
+          // then clear the high-res image and unlock the mouse clicks.
+          d3.select("body").transition("escapeCleanup")
+            .duration(1100)
+            .each("end", function() {
+                // Wipe the description and big image
+                if (typeof clearBigImages === "function") clearBigImages();
+                
+                // Unlock the canvas so small images are clickable
+                vizContainer.style("pointer-events", "auto");
+                
+                // Safely reset states
+                drag = false;
+                zoomedToImage = false;
+                selectedImage = null;
+                state.zoomingToImage = false;
+            });
         }
       }
     }, true);
