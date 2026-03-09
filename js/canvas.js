@@ -794,11 +794,9 @@ var renderOptions = {
     //canvas.project();
     animate();
 
-    // selectedImage = data.find(d => d.id == 88413)
-    // showDetail(selectedImage)
     state.init = true;
+
     window.addEventListener("keydown", function(event) {
- window.addEventListener("keydown", function(event) {
       if (event.key === "Escape" || event.keyCode === 27) {
         if (zoomedToImage) {
           event.preventDefault();
@@ -806,7 +804,6 @@ var renderOptions = {
           
           // Let the native function handle the entire sequence!
           canvas.resetZoom(); 
-          }
         }
       }
     }, true);
