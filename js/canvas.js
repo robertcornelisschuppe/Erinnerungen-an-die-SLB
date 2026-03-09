@@ -1184,6 +1184,16 @@ function mousemove(d) {
     //var scale = 1 / (rangeBandImage / (width * 0.8));
     var max = Math.max(width, height);
     var scale = 1 / (rangeBandImage / (max * 0.6));
+  
+    var worldImageHeight = d.sprite.height / scale1;
+    
+    var maxScreenHeight = height * 0.90; 
+    
+    if ((worldImageHeight * scale) > maxScreenHeight) {
+      scale = maxScreenHeight / worldImageHeight;
+    }
+    
+    var visibleCenter = (width - 700) / 2;
     var visibleCenter = (width - 700) / 2;
     var translateNow = [
       visibleCenter - scale * (d.x + padding) + margin.left,
