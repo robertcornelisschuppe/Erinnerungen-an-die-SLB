@@ -797,49 +797,36 @@ var renderOptions = {
     // selectedImage = data.find(d => d.id == 88413)
     // showDetail(selectedImage)
     state.init = true;
-    window.addEventListener("keydown", function(event) {
+window.addEventListener("keydown", function(event) {
       if (event.key === "Escape" || event.keyCode === 27) {
         if (zoomedToImage) {
           
           event.preventDefault();
           event.stopPropagation();
-            
-          // 1. Interrupt any frozen D3 animations from the background tab
-          vizContainer.interrupt();
-            
-          // 2. Force state flags to false (Fixes the "stuck drag" bug)
-          zoomedToImage = false;
-          selectedImage = null;
-          state.zoomingToImage = false;
-          drag = false;
-          spriteClick = false;
           
-          // 3. Move camera back and stop media
-          canvas.resetZoom();
+          // 1. Stop media and hide UI elements immediately
           canvas.clearMedia(); 
-          
-          // 4. Hide the detail sidebar and bring back the tagcloud
           d3.select(".sidebar").classed("sneak", true);
           d3.select(".tagcloud").classed("hide", false);
           
-          // 5. Clear the high-res image and text from the canvas
-          if (typeof clearBigImages === "function") {
-              clearBigImages();
-          }
+          if (typeof clearBigImages === "function") clearBigImages();
+          if (typeof utils !== "undefined" && utils.updateHash) utils.updateHash("ids", "");
           
-          // 6. Clear the URL hash
-          if (typeof utils !== "undefined" && utils.updateHash) {
-              utils.updateHash("ids", "");
-          }
+          // 2. Trigger the camera fly-out
+          canvas.resetZoom();
           
-          // 7. SAFETY CATCH: Force the canvas to accept clicks again 
-          // a split-second after the zoom-out animation is expected to finish
-          setTimeout(function() {
-              vizContainer.style("pointer-events", "auto");
-              drag = false; 
-          }, 1100); 
-          
-          // 8. Wake up the rendering engine
+          // 3. THE MAGIC FIX: We use a D3 transition on the body as a timer.
+          // Unlike setTimeout, this automatically pauses if you switch tabs,
+          // guaranteeing it unlocks the canvas exactly when the camera lands!
+          d3.select("body").transition("escapeCleanup")
+            .duration(1100)
+            .each("end", function() {
+                vizContainer.style("pointer-events", "auto");
+                drag = false;
+                zoomedToImage = false;
+                state.zoomingToImage = false;
+            });
+            
           sleep = false;
         }
       }
