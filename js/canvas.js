@@ -1854,6 +1854,34 @@ function mousemove(d) {
     sprite._data = d;
     d.big = true;
     stage5.addChild(sprite);
+    // --- START OF DESCRIPTION TEXT CODE ---
+    if (d._description) {
+      var style = new PIXI.TextStyle({
+        fontFamily: 'Lato, Arial, sans-serif',
+        fontSize: 50,
+        fill: '#ffffff',
+        wordWrap: true,
+        wordWrapWidth: imageSize3 * 0.8,
+        align: 'center'
+      });
+
+      var descText = new PIXI.Text(d._description, style);
+      
+      descText.anchor.x = 0.5; 
+      descText.anchor.y = 0;   
+
+      descText.position.x = d.x * scale3 + imageSize3 / 2;
+      var updateTextPosition = function() {
+        var actualHeight = sprite.height || imageSize3;
+        descText.position.y = (d.y * scale3 + imageSize3 / 2) + (actualHeight / 2) + 80;
+        sleep = false;
+      };
+
+      updateTextPosition(); // Try setting it immediately
+      texture.once("update", updateTextPosition); // Reset it once the image finishes loading
+
+      stage5.addChild(descText);
+    }
     sleep = false;
   }
 
