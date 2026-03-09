@@ -1173,7 +1173,6 @@ function zoomToImage(d, duration) {
     var max = Math.max(width, height);
     var scale = 1 / (rangeBandImage / (max * 0.6));
     
-    // --- START OF ROBUST PORTRAIT FIX ---
     var imageAspectRatio = 1;
     
     // Get the true aspect ratio directly from the loaded PIXI texture of the thumbnail!
@@ -1187,13 +1186,12 @@ function zoomToImage(d, duration) {
     var screenImageHeight = (rangeBandImage * scale) * imageAspectRatio;
     
     // Set our limit to 75% of the browser window's height
-    var maxScreenHeight = height * 0.75; 
+    var maxScreenHeight = height * 0.95; 
     
     // If the projected height is taller than our limit, shrink the zoom scale proportionally
     if (screenImageHeight > maxScreenHeight) {
         scale = scale * (maxScreenHeight / screenImageHeight);
     }
-    // --- END OF ROBUST PORTRAIT FIX ---
     
     var visibleCenter = (width - 700) / 2;
 
