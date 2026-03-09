@@ -797,6 +797,17 @@ var renderOptions = {
     // selectedImage = data.find(d => d.id == 88413)
     // showDetail(selectedImage)
     state.init = true;
+    window.addEventListener("keydown", function(event) {
+      if (event.key === "Escape" || event.keyCode === 27) {
+        // If an image is currently maximized, reset the zoom and close the sidebar
+        if (zoomedToImage) {
+          canvas.resetZoom();
+          
+          // Optional: If a video/audio was playing, this stops it from continuing in the background
+          canvas.clearMedia(); 
+        }
+      }
+    });
   };
 
   var imageBorders = {};
@@ -1168,7 +1179,7 @@ function zoomToImage(d, duration) {
     zoom.center(null);
     
     loadMiddleImage(d);
-    loadBigImage(d, "click"); // <--- ADD IT HERE to load during the animation
+    loadBigImage(d, "click");
     
     d3.select(".tagcloud").classed("hide", true);
 
@@ -1176,7 +1187,6 @@ function zoomToImage(d, duration) {
     var max = Math.max(width, height);
     var scale = 1 / (rangeBandImage / (max * 0.6));
     
-    // --- START OF ROBUST PORTRAIT FIX ---
     var imageAspectRatio = 1;
     if (d.sprite && d.sprite.texture && d.sprite.texture.width > 0) {
         imageAspectRatio = d.sprite.texture.height / d.sprite.texture.width;
@@ -1184,11 +1194,10 @@ function zoomToImage(d, duration) {
         imageAspectRatio = d.sprite.height / d.sprite.width;
     }
     var screenImageHeight = (rangeBandImage * scale) * imageAspectRatio;
-    var maxScreenHeight = height * 0.75; 
+    var maxScreenHeight = height * 0.95; 
     if (screenImageHeight > maxScreenHeight) {
         scale = scale * (maxScreenHeight / screenImageHeight);
     }
-    // --- END OF ROBUST PORTRAIT FIX ---
     
     var visibleCenter = (width - 700) / 2;
 
