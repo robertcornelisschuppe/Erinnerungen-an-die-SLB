@@ -803,8 +803,18 @@ window.addEventListener("keydown", function(event) {
           
           event.preventDefault();
           event.stopPropagation();
+
+          // 1. Interrupt any stuck animations
+          vizContainer.interrupt();
           
-          // 1. Stop media and hide UI elements immediately
+          // 2. RESET STATES IMMEDIATELY (This is why it wouldn't minimize!)
+          zoomedToImage = false;
+          selectedImage = null;
+          state.zoomingToImage = false;
+          drag = false;
+          spriteClick = false;
+          
+          // 3. Stop media and hide UI elements immediately
           canvas.clearMedia(); 
           d3.select(".sidebar").classed("sneak", true);
           d3.select(".tagcloud").classed("hide", false);
@@ -812,19 +822,15 @@ window.addEventListener("keydown", function(event) {
           if (typeof clearBigImages === "function") clearBigImages();
           if (typeof utils !== "undefined" && utils.updateHash) utils.updateHash("ids", "");
           
-          // 2. Trigger the camera fly-out
+          // 4. Trigger the camera fly-out
           canvas.resetZoom();
           
-          // 3. THE MAGIC FIX: We use a D3 transition on the body as a timer.
-          // Unlike setTimeout, this automatically pauses if you switch tabs,
-          // guaranteeing it unlocks the canvas exactly when the camera lands!
+          // 5. THE TAB-SAFE TIMER: Only use the delay for unlocking pointer-events
           d3.select("body").transition("escapeCleanup")
             .duration(1100)
             .each("end", function() {
                 vizContainer.style("pointer-events", "auto");
                 drag = false;
-                zoomedToImage = false;
-                state.zoomingToImage = false;
             });
             
           sleep = false;
