@@ -798,26 +798,33 @@ var renderOptions = {
     // showDetail(selectedImage)
     state.init = true;
     window.addEventListener("keydown", function(event) {
-    if (event.key === "Escape" || event.keyCode === 27) {
-        // If an image is currently maximized, reset everything
+      if (event.key === "Escape" || event.keyCode === 27) {
         if (zoomedToImage) {
-          // 1. Move the camera back
-          canvas.resetZoom();
+          // 1. Force state flags to false so mouse hovering and clicking work again
+          zoomedToImage = false;
+          selectedImage = null;
+          state.zoomingToImage = false;
           
-          // 2. Stop any playing media
+          // 2. Move camera back and stop media
+          canvas.resetZoom();
           canvas.clearMedia(); 
           
-          // 3. Hide the sidebar physically
-          if (typeof hideDetail === "function") {
-              hideDetail();
-          } else {
-              d3.select(".sidebar").classed("sneak", true); // Fallback
+          // 3. Hide the detail sidebar and bring back the tagcloud
+          d3.select(".sidebar").classed("sneak", true);
+          d3.select(".tagcloud").classed("hide", false);
+          
+          // 4. Clear the high-res image and text from the canvas
+          if (typeof clearBigImages === "function") {
+              clearBigImages();
           }
           
-          // 4. Clear the selection from the URL hash so it doesn't reopen on refresh
+          // 5. Clear the URL hash so the application knows nothing is selected
           if (typeof utils !== "undefined" && utils.updateHash) {
               utils.updateHash("ids", "");
           }
+          
+          // 6. Wake up the rendering engine to instantly apply these changes
+          sleep = false;
         }
       }
     });
