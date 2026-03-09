@@ -1176,13 +1176,10 @@ function zoomToImage(d, duration) {
     // --- START OF ROBUST PORTRAIT FIX ---
     var imageAspectRatio = 1;
     
-    // 1. Try to get the aspect ratio from your CSV data (e.g. "9:16" or "16:9")
-    if (d.aspect_ratio && d.aspect_ratio.includes(":")) {
-        var parts = d.aspect_ratio.split(":");
-        imageAspectRatio = parseFloat(parts[1]) / parseFloat(parts[0]);
-    } 
-    // 2. Fallback to the PIXI sprite dimensions if CSV data is missing
-    else if (d.sprite && d.sprite.width > 0) {
+    // Get the true aspect ratio directly from the loaded PIXI texture of the thumbnail!
+    if (d.sprite && d.sprite.texture && d.sprite.texture.width > 0) {
+        imageAspectRatio = d.sprite.texture.height / d.sprite.texture.width;
+    } else if (d.sprite && d.sprite.width > 0) {
         imageAspectRatio = d.sprite.height / d.sprite.width;
     }
 
