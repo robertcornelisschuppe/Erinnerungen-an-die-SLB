@@ -801,14 +801,18 @@ var renderOptions = {
       if (event.key === "Escape" || event.keyCode === 27) {
         if (zoomedToImage) {
           
-          // 1. Force the browser to prioritize this action and stop other elements from eating the keystroke
           event.preventDefault();
           event.stopPropagation();
             
-          // 2. Force state flags to false so mouse hovering and clicking work again
+          // 1. Interrupt any frozen D3 animations from the background tab
+          vizContainer.interrupt();
+            
+          // 2. Force state flags to false (Fixes the "stuck drag" bug)
           zoomedToImage = false;
           selectedImage = null;
           state.zoomingToImage = false;
+          drag = false;
+          spriteClick = false;
           
           // 3. Move camera back and stop media
           canvas.resetZoom();
@@ -823,12 +827,19 @@ var renderOptions = {
               clearBigImages();
           }
           
-          // 6. Clear the URL hash so the application knows nothing is selected
+          // 6. Clear the URL hash
           if (typeof utils !== "undefined" && utils.updateHash) {
               utils.updateHash("ids", "");
           }
           
-          // 7. Wake up the rendering engine to instantly apply these changes
+          // 7. SAFETY CATCH: Force the canvas to accept clicks again 
+          // a split-second after the zoom-out animation is expected to finish
+          setTimeout(function() {
+              vizContainer.style("pointer-events", "auto");
+              drag = false; 
+          }, 1100); 
+          
+          // 8. Wake up the rendering engine
           sleep = false;
         }
       }
@@ -1210,7 +1221,7 @@ function zoomToImage(d, duration) {
 
     var padding = rangeBandImage / 2;
     var max = Math.max(width, height);
-    var scale = 1 / (rangeBandImage / (max * 0.9));
+    var scale = 1 / (rangeBandImage / (max * 0.85));
     
     var imageAspectRatio = 1;
     if (d.sprite && d.sprite.texture && d.sprite.texture.width > 0) {
