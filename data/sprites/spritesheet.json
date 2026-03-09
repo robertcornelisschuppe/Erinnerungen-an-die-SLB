@@ -53,9 +53,20 @@
           }
         },
         {
-          "name": "Dissertation_Landmann",
+          "name": "Hofkirche",
           "position": {
             "x": 362,
+            "y": 1
+          },
+          "dimension": {
+            "w": 120,
+            "h": 128
+          }
+        },
+        {
+          "name": "Dissertation_Landmann",
+          "position": {
+            "x": 484,
             "y": 1
           },
           "dimension": {
@@ -66,7 +77,7 @@
         {
           "name": "Burgemeister",
           "position": {
-            "x": 447,
+            "x": 569,
             "y": 1
           },
           "dimension": {
@@ -77,7 +88,7 @@
         {
           "name": "Bericht_Zentralkomitee",
           "position": {
-            "x": 535,
+            "x": 657,
             "y": 1
           },
           "dimension": {
@@ -86,9 +97,20 @@
           }
         },
         {
+          "name": "Benutzung_Fotothek",
+          "position": {
+            "x": 756,
+            "y": 1
+          },
+          "dimension": {
+            "w": 121,
+            "h": 128
+          }
+        },
+        {
           "name": "Ausleihvermerk",
           "position": {
-            "x": 634,
+            "x": 879,
             "y": 1
           },
           "dimension": {
@@ -97,10 +119,21 @@
           }
         },
         {
+          "name": "Ausbau_Garnisonskirche",
+          "position": {
+            "x": 1,
+            "y": 131
+          },
+          "dimension": {
+            "w": 86,
+            "h": 128
+          }
+        },
+        {
           "name": "TU_Bib",
           "position": {
-            "x": 723,
-            "y": 1
+            "x": 89,
+            "y": 131
           },
           "dimension": {
             "w": 128,
@@ -110,8 +143,8 @@
         {
           "name": "Hochschule_für_Musik",
           "position": {
-            "x": 853,
-            "y": 1
+            "x": 219,
+            "y": 131
           },
           "dimension": {
             "w": 128,
@@ -121,7 +154,7 @@
         {
           "name": "Übergabe_Neubau",
           "position": {
-            "x": 1,
+            "x": 349,
             "y": 131
           },
           "dimension": {
@@ -132,7 +165,7 @@
         {
           "name": "Palasthotel",
           "position": {
-            "x": 131,
+            "x": 479,
             "y": 131
           },
           "dimension": {
@@ -141,9 +174,20 @@
           }
         },
         {
+          "name": "Sondersammlungen",
+          "position": {
+            "x": 609,
+            "y": 131
+          },
+          "dimension": {
+            "w": 128,
+            "h": 92
+          }
+        },
+        {
           "name": "Schallplattennutzung",
           "position": {
-            "x": 261,
+            "x": 739,
             "y": 131
           },
           "dimension": {
@@ -154,7 +198,7 @@
         {
           "name": "Marienallee",
           "position": {
-            "x": 391,
+            "x": 869,
             "y": 131
           },
           "dimension": {
@@ -165,8 +209,8 @@
         {
           "name": "Ferienheim",
           "position": {
-            "x": 521,
-            "y": 131
+            "x": 1,
+            "y": 261
           },
           "dimension": {
             "w": 128,
@@ -174,10 +218,21 @@
           }
         },
         {
+          "name": "Zeitrschriftenstelle",
+          "position": {
+            "x": 131,
+            "y": 261
+          },
+          "dimension": {
+            "w": 128,
+            "h": 91
+          }
+        },
+        {
           "name": "Musiklesesaal",
           "position": {
-            "x": 651,
-            "y": 131
+            "x": 261,
+            "y": 261
           },
           "dimension": {
             "w": 128,
@@ -187,8 +242,8 @@
         {
           "name": "Lesesaal",
           "position": {
-            "x": 781,
-            "y": 131
+            "x": 391,
+            "y": 261
           },
           "dimension": {
             "w": 128,
@@ -198,8 +253,19 @@
         {
           "name": "Dresden_zerstört",
           "position": {
-            "x": 1,
-            "y": 227
+            "x": 521,
+            "y": 261
+          },
+          "dimension": {
+            "w": 128,
+            "h": 90
+          }
+        },
+        {
+          "name": "Buchmesse",
+          "position": {
+            "x": 651,
+            "y": 261
           },
           "dimension": {
             "w": 128,
@@ -209,8 +275,8 @@
         {
           "name": "Ausleihe",
           "position": {
-            "x": 131,
-            "y": 227
+            "x": 781,
+            "y": 261
           },
           "dimension": {
             "w": 128,
@@ -220,8 +286,8 @@
         {
           "name": "Bundesmann",
           "position": {
-            "x": 261,
-            "y": 227
+            "x": 1,
+            "y": 355
           },
           "dimension": {
             "w": 128,
@@ -231,8 +297,8 @@
         {
           "name": "Wachsmatrize",
           "position": {
-            "x": 391,
-            "y": 227
+            "x": 131,
+            "y": 355
           },
           "dimension": {
             "w": 128,
@@ -242,8 +308,8 @@
         {
           "name": "Bildindex_der_Kunst_und_Architektur_Logo",
           "position": {
-            "x": 521,
-            "y": 227
+            "x": 261,
+            "y": 355
           },
           "dimension": {
             "w": 128,
