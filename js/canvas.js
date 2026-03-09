@@ -1162,45 +1162,50 @@ function mousemove(d) {
 
   window.zoomToYear = zoomToYear;
 
-  function zoomToImage(d, duration) {
+function zoomToImage(d, duration) {
     state.zoomingToImage = true;
     vizContainer.style("pointer-events", "none");
     zoom.center(null);
     loadMiddleImage(d);
     d3.select(".tagcloud").classed("hide", true);
 
-    // var padding = (state.mode.type === "group" ? 0.1 : 0.8) * rangeBandImage;
-    // var sidbar = width / 8;
-    // // var scale = d.sprite.width / rangeBandImage * columns * 1.3;
-    // var scale = scale1 * 4;
-    // console.log(d, imgPadding, scale, scale1, padding, scale1, d.x, d.sprite.width);
-
-    // var translateNow = [
-    //   -scale * (d.x + margin.left / scale1 / 6 ),
-    //   -scale * (height + d.y + (margin.top / scale1 / 2)),
-    // ];
-
     var padding = rangeBandImage / 2;
-    //var scale = 1 / (rangeBandImage / (width * 0.8));
     var max = Math.max(width, height);
     var scale = 1 / (rangeBandImage / (max * 0.6));
-  
-    var worldImageHeight = d.sprite.height / scale1;
     
-    var maxScreenHeight = height * 0.90; 
+    // --- START OF ROBUST PORTRAIT FIX ---
+    var imageAspectRatio = 1;
     
-    if ((worldImageHeight * scale) > maxScreenHeight) {
-      scale = maxScreenHeight / worldImageHeight;
+    // 1. Try to get the aspect ratio from your CSV data (e.g. "9:16" or "16:9")
+    if (d.aspect_ratio && d.aspect_ratio.includes(":")) {
+        var parts = d.aspect_ratio.split(":");
+        imageAspectRatio = parseFloat(parts[1]) / parseFloat(parts[0]);
+    } 
+    // 2. Fallback to the PIXI sprite dimensions if CSV data is missing
+    else if (d.sprite && d.sprite.width > 0) {
+        imageAspectRatio = d.sprite.height / d.sprite.width;
     }
+
+    // Calculate how tall the image WILL be on the screen based on the initial scale
+    var screenImageHeight = (rangeBandImage * scale) * imageAspectRatio;
+    
+    // Set our limit to 75% of the browser window's height
+    var maxScreenHeight = height * 0.75; 
+    
+    // If the projected height is taller than our limit, shrink the zoom scale proportionally
+    if (screenImageHeight > maxScreenHeight) {
+        scale = scale * (maxScreenHeight / screenImageHeight);
+    }
+    // --- END OF ROBUST PORTRAIT FIX ---
     
     var visibleCenter = (width - 700) / 2;
-    var visibleCenter = (width - 700) / 2;
-    var translateNow = [
-      visibleCenter - scale * (d.x + padding) + margin.left,
-      -scale * (height + d.y + padding) - margin.top + height / 2,
-    ];
 
-    // console.log(translateNow)
+    // CRUCIAL: translateNow is calculated HERE, after the scale is finalized!
+    // This ensures the camera perfectly centers the portrait image.
+    var translateNow = [
+        visibleCenter - scale * (d.x + padding),
+        height / 2 - scale * (height + d.y + padding)
+    ];
 
     zoomedToImageScale = scale;
 
