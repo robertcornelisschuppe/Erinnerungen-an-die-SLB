@@ -798,13 +798,26 @@ var renderOptions = {
     // showDetail(selectedImage)
     state.init = true;
     window.addEventListener("keydown", function(event) {
-      if (event.key === "Escape" || event.keyCode === 27) {
-        // If an image is currently maximized, reset the zoom and close the sidebar
+    if (event.key === "Escape" || event.keyCode === 27) {
+        // If an image is currently maximized, reset everything
         if (zoomedToImage) {
+          // 1. Move the camera back
           canvas.resetZoom();
           
-          // Optional: If a video/audio was playing, this stops it from continuing in the background
+          // 2. Stop any playing media
           canvas.clearMedia(); 
+          
+          // 3. Hide the sidebar physically
+          if (typeof hideDetail === "function") {
+              hideDetail();
+          } else {
+              d3.select(".sidebar").classed("sneak", true); // Fallback
+          }
+          
+          // 4. Clear the selection from the URL hash so it doesn't reopen on refresh
+          if (typeof utils !== "undefined" && utils.updateHash) {
+              utils.updateHash("ids", "");
+          }
         }
       }
     });
