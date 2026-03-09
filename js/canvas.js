@@ -800,34 +800,39 @@ var renderOptions = {
     window.addEventListener("keydown", function(event) {
       if (event.key === "Escape" || event.keyCode === 27) {
         if (zoomedToImage) {
-          // 1. Force state flags to false so mouse hovering and clicking work again
+          
+          // 1. Force the browser to prioritize this action and stop other elements from eating the keystroke
+          event.preventDefault();
+          event.stopPropagation();
+            
+          // 2. Force state flags to false so mouse hovering and clicking work again
           zoomedToImage = false;
           selectedImage = null;
           state.zoomingToImage = false;
           
-          // 2. Move camera back and stop media
+          // 3. Move camera back and stop media
           canvas.resetZoom();
           canvas.clearMedia(); 
           
-          // 3. Hide the detail sidebar and bring back the tagcloud
+          // 4. Hide the detail sidebar and bring back the tagcloud
           d3.select(".sidebar").classed("sneak", true);
           d3.select(".tagcloud").classed("hide", false);
           
-          // 4. Clear the high-res image and text from the canvas
+          // 5. Clear the high-res image and text from the canvas
           if (typeof clearBigImages === "function") {
               clearBigImages();
           }
           
-          // 5. Clear the URL hash so the application knows nothing is selected
+          // 6. Clear the URL hash so the application knows nothing is selected
           if (typeof utils !== "undefined" && utils.updateHash) {
               utils.updateHash("ids", "");
           }
           
-          // 6. Wake up the rendering engine to instantly apply these changes
+          // 7. Wake up the rendering engine to instantly apply these changes
           sleep = false;
         }
       }
-    });
+    }, true);
   };
 
   var imageBorders = {};
