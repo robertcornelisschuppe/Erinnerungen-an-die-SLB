@@ -806,6 +806,7 @@ var renderOptions = {
           
           // Let the native function handle the entire sequence!
           canvas.resetZoom(); 
+          }
         }
       }
     }, true);
