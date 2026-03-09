@@ -798,48 +798,14 @@ var renderOptions = {
     // showDetail(selectedImage)
     state.init = true;
     window.addEventListener("keydown", function(event) {
+ window.addEventListener("keydown", function(event) {
       if (event.key === "Escape" || event.keyCode === 27) {
         if (zoomedToImage) {
-          
           event.preventDefault();
           event.stopPropagation();
-
-          // 1. Stop media instantly
-          canvas.clearMedia(); 
           
-          // 2. Hide the sidebar and bring back the tagcloud instantly
-          d3.select(".sidebar").classed("sneak", true);
-          d3.select(".tagcloud").classed("hide", false);
-          
-          // 3. Clear the URL hash instantly
-          if (typeof utils !== "undefined" && utils.updateHash) utils.updateHash("ids", "");
-          
-          // 4. Trigger the native camera zoom-out. 
-          // (We MUST do this while zoomedToImage is still true, otherwise the camera won't move!)
-          canvas.resetZoom();
-          
-          // 5. THE TAB-SAFE CLEANUP TIMER: 
-          // Wait 1100ms for the camera to finish moving, then forcefully reset everything.
-          d3.select("body").transition("escapeCleanup")
-            .duration(1100)
-            .each("end", function() {
-                // Unlock the canvas for clicks
-                vizContainer.style("pointer-events", "auto");
-                
-                // Safely reset the drag and zoom states
-                drag = false;
-                spriteClick = false;
-                zoomedToImage = false;
-                selectedImage = null;
-                state.zoomingToImage = false;
-                
-                // Safely wipe the high-res texture and the description text from the canvas layer
-                if (typeof clearBigImages === "function") clearBigImages();
-                
-                sleep = false;
-            });
-            
-          sleep = false;
+          // Let the native function handle the entire sequence!
+          canvas.resetZoom(); 
         }
       }
     }, true);
