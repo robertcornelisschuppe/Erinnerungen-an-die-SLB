@@ -796,14 +796,16 @@ var renderOptions = {
 
     state.init = true;
 
-    window.addEventListener("keydown", function(event) {
+window.addEventListener("keydown", function(event) {
       if (event.key === "Escape" || event.keyCode === 27) {
-        if (zoomedToImage) {
+        // We check pointer-events here. If it's already "none", we know the 
+        // animation is currently running, which acts as our lock against key-stutter!
+        if (zoomedToImage && vizContainer.style("pointer-events") !== "none") {
           event.preventDefault();
           event.stopPropagation();
           
-          // 1. IMMEDIATE LOCK: Prevent keyboard repeat from stuttering the camera
-          zoomedToImage = false; 
+          // 1. BLOCK THE MOUSE! This prevents `mousemove` from interrupting the zoom.
+          vizContainer.style("pointer-events", "none");
           
           // 2. Instant UI changes
           d3.select(".sidebar").classed("sneak", true);
@@ -815,19 +817,20 @@ var renderOptions = {
           // 3. Trigger native zoom out smoothly
           canvas.resetZoom(); 
           
-          // 4. The Tab-Safe Timer: Wait for the camera to finish (1100ms),
-          // then wipe the high-res images and unlock the mouse clicks.
+          // 4. The Tab-Safe Timer: Wait for the camera to finish (1100ms)
           d3.select("body").transition("escapeCleanup")
             .duration(1100) 
             .each("end", function() {
                 if (typeof clearBigImages === "function") clearBigImages();
                 
-                vizContainer.style("pointer-events", "auto");
-                
-                // Final safety resets
+                // Unlock the states AT THE END so mouse movements are safe again
+                zoomedToImage = false;
                 drag = false;
                 selectedImage = null;
                 state.zoomingToImage = false;
+                
+                // Turn mouse interactions back on
+                vizContainer.style("pointer-events", "auto");
             });
         }
       }
