@@ -1884,10 +1884,9 @@ canvas.resetZoom = function (callback) {
     d.big = true;
     stage5.addChild(sprite);
 if (d._description) {
-      // 1. Revert to your original 70px base size — it is correct for PIXI's massive canvas!
       var style = new PIXI.TextStyle({
         fontFamily: 'Lato, Arial, sans-serif',
-        fontSize: 150, 
+        fontSize: 120, 
         fill: '#ffffff',
         wordWrap: true,
         wordWrapWidth: imageSize3 * 0.8,
