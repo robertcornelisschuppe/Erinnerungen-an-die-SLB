@@ -1883,13 +1883,25 @@ canvas.resetZoom = function (callback) {
     sprite._data = d;
     d.big = true;
     stage5.addChild(sprite);
-    if (d._description) {
+if (d._description) {
+      // 1. Grab the current global D3 zoom scale 
+      // (Assuming 'scale' is your global variable based on earlier snippets)
+      var currentScale = typeof scale !== "undefined" ? scale : 1; 
+      var inverseScale = 1 / currentScale;
+
+      // 2. Set your desired visual sizes for the screen
+      var targetVisualFontSize = 16; // The exact pixel size you want to read (e.g., 16px)
+      var targetVisualGap = 30;      // Constant spacing below the image (e.g., 30px)
+      var wrapPercentage = 0.8;      // Keep word wrap at 80% of the image
+
       var style = new PIXI.TextStyle({
         fontFamily: 'Lato, Arial, sans-serif',
-        fontSize: 70,
+        // Multiply by currentScale so PIXI renders a high-res texture internally
+        fontSize: targetVisualFontSize * currentScale, 
         fill: '#ffffff',
         wordWrap: true,
-        wordWrapWidth: imageSize3 * 0.8,
+        // The wrap width must be expanded internally to match the inverse scale
+        wordWrapWidth: (imageSize3 * wrapPercentage) * currentScale, 
         align: 'center'
       });
 
@@ -1898,15 +1910,22 @@ canvas.resetZoom = function (callback) {
       descText.anchor.x = 0.5; 
       descText.anchor.y = 0;   
 
+      // 3. Counter-scale the text object! This cancels out the D3 zoom.
+      descText.scale.set(inverseScale);
+
       descText.position.x = d.x * scale3 + imageSize3 / 2;
+      
       var updateTextPosition = function() {
         var actualHeight = sprite.height || imageSize3;
-        descText.position.y = (d.y * scale3 + imageSize3 / 2) + (actualHeight / 2) + 80;
+        // 4. Shrink the gap mathematically so the spacing stays constant too
+        var localGap = targetVisualGap * inverseScale; 
+        
+        descText.position.y = (d.y * scale3 + imageSize3 / 2) + (actualHeight / 2) + localGap;
         sleep = false;
       };
 
-      updateTextPosition(); // Try setting it immediately
-      texture.once("update", updateTextPosition); // Reset it once the image finishes loading
+      updateTextPosition(); 
+      texture.once("update", updateTextPosition); 
 
       stage5.addChild(descText);
     }
