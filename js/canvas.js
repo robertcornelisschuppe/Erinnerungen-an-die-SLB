@@ -1189,7 +1189,7 @@ function zoomToImage(d, duration) {
 
     var padding = rangeBandImage / 2;
     var max = Math.max(width, height);
-    var scale = 1 / (rangeBandImage / (max * 0.8));
+    var scale = 1 / (rangeBandImage / (max * 0.85));
     
     var imageAspectRatio = 1;
     if (d.sprite && d.sprite.texture && d.sprite.texture.width > 0) {
@@ -1198,7 +1198,7 @@ function zoomToImage(d, duration) {
         imageAspectRatio = d.sprite.height / d.sprite.width;
     }
     var screenImageHeight = (rangeBandImage * scale) * imageAspectRatio;
-    var maxScreenHeight = height * 0.95; 
+    var maxScreenHeight = height * 0.9; 
     if (screenImageHeight > maxScreenHeight) {
         scale = scale * (maxScreenHeight / screenImageHeight);
     }
