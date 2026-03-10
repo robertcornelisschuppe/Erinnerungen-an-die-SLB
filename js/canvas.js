@@ -1887,7 +1887,7 @@ if (d._description) {
       // 1. Revert to your original 70px base size — it is correct for PIXI's massive canvas!
       var style = new PIXI.TextStyle({
         fontFamily: 'Lato, Arial, sans-serif',
-        fontSize: 70, 
+        fontSize: 150, 
         fill: '#ffffff',
         wordWrap: true,
         wordWrapWidth: imageSize3 * 0.8,
