@@ -796,34 +796,36 @@ var renderOptions = {
 
     state.init = true;
 
-window.addEventListener("keydown", function(event) {
+    window.addEventListener("keydown", function(event) {
       if (event.key === "Escape" || event.keyCode === 27) {
         if (zoomedToImage) {
           event.preventDefault();
           event.stopPropagation();
           
-          // 1. Instantly hide the sidebar and show the tagcloud
+          // 1. IMMEDIATE LOCK: Prevent keyboard repeat from stuttering the camera
+          zoomedToImage = false; 
+          
+          // 2. Instant UI changes
           d3.select(".sidebar").classed("sneak", true);
           d3.select(".tagcloud").classed("hide", false);
-          if (canvas.clearMedia) canvas.clearMedia();
+          if (typeof utils !== "undefined" && utils.updateHash) {
+              utils.updateHash("ids", "");
+          }
           
-          // 2. Trigger the camera fly-out (WITHOUT changing the URL hash yet)
+          // 3. Trigger native zoom out smoothly
           canvas.resetZoom(); 
           
-          // 3. The Tab-Safe Timer: Wait for the camera to finish (1.1 seconds), 
-          // then clear the high-res image and unlock the mouse clicks.
+          // 4. The Tab-Safe Timer: Wait for the camera to finish (1100ms),
+          // then wipe the high-res images and unlock the mouse clicks.
           d3.select("body").transition("escapeCleanup")
-            .duration(1100)
+            .duration(1100) 
             .each("end", function() {
-                // Wipe the description and big image
                 if (typeof clearBigImages === "function") clearBigImages();
                 
-                // Unlock the canvas so small images are clickable
                 vizContainer.style("pointer-events", "auto");
                 
-                // Safely reset states
+                // Final safety resets
                 drag = false;
-                zoomedToImage = false;
                 selectedImage = null;
                 state.zoomingToImage = false;
             });
