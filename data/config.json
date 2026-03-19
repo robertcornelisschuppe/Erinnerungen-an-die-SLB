@@ -56,8 +56,14 @@
         "type": "text"
       },
       {
+        "name": "Jahrgang",
+        "source": "birth",
+        "display": "column",
+        "type": "text"
+      },
+      {
         "name": "Funktion",
-        "source": "role",
+        "source": "function",
         "display": "column",
         "type": "text"
       },
