@@ -1886,7 +1886,7 @@ canvas.resetZoom = function (callback) {
 if (d._description) {
       // 1. SOLVE BLURRINESS: Render at an ultra-high resolution internally
       var highResMultiplier = 4;
-      var targetScreenFontSize = 16; // The constant font size you want on your screen (e.g., 16px)
+      var targetScreenFontSize = 32;
 
       // We wrap the text based on your browser window's width so it's always readable
       // 'width' is the global variable already defined at the top of canvas.js
