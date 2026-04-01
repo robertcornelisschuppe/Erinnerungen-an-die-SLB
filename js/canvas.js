@@ -1884,45 +1884,55 @@ canvas.resetZoom = function (callback) {
     d.big = true;
     stage5.addChild(sprite);
 if (d._description) {
+      // 1. SOLVE BLURRINESS: Render at an ultra-high resolution internally
+      var highResMultiplier = 4;
+      var targetScreenFontSize = 16; // The constant font size you want on your screen (e.g., 16px)
+
+      // We wrap the text based on your browser window's width so it's always readable
+      // 'width' is the global variable already defined at the top of canvas.js
+      var wrapWidthOnScreen = width * 0.8; // 80% of the screen width
+
       var style = new PIXI.TextStyle({
         fontFamily: 'Lato, Arial, sans-serif',
-        fontSize: 120, 
+        // Multiply up to create a massive, crisp internal texture
+        fontSize: targetScreenFontSize * highResMultiplier, 
         fill: '#ffffff',
         wordWrap: true,
-        wordWrapWidth: imageSize3 * 0.8,
+        wordWrapWidth: wrapWidthOnScreen * highResMultiplier,
         align: 'center'
       });
 
       var descText = new PIXI.Text(d._description, style);
-      
-      descText.anchor.x = 0.5; 
-      descText.anchor.y = 0;   
-
-      // 2. THE FIX: Scale the text in lockstep with the image's specific scale factor.
-      // Now, no matter how much D3 has to zoom in or out to fit the image, 
-      // the text is perfectly counter-balanced.
-      var sf = d.scaleFactor || 1;
-      descText.scale.set(sf);
-
+      descText.anchor.x = 0.5;
+      descText.anchor.y = 0;
       descText.position.x = d.x * scale3 + imageSize3 / 2;
-      
+
       var updateTextPosition = function() {
         var actualHeight = sprite.height || imageSize3;
-        
-        // 3. We also multiply the gap by the scale factor so the spacing stays constant!
-        var gap = 80 * sf; 
-        
-        descText.position.y = (d.y * scale3 + imageSize3 / 2) + (actualHeight / 2) + gap;
+        var actualWidth = sprite.width || imageSize3;
+
+        // 2. SOLVE CONSTANT SIZE: Calculate exactly how D3 will fit this image to the screen
+        // 'width' and 'height' are your global Canvas window dimensions
+        var screenFitRatio = Math.max(actualWidth / width, actualHeight / height);
+
+        // Apply the counter-scale so it perfectly opposes the final D3 zoom level,
+        // while also shrinking the high-resolution multiplier back down.
+        descText.scale.set(screenFitRatio / highResMultiplier);
+
+        // Keep the gap below the image constant on your physical screen too
+        var targetScreenGap = 40; // e.g., exactly 40px gap on your monitor
+        var gapInPixi = targetScreenGap * screenFitRatio;
+
+        descText.position.y = (d.y * scale3 + imageSize3 / 2) + (actualHeight / 2) + gapInPixi;
         sleep = false;
       };
 
-      updateTextPosition(); 
-      texture.once("update", updateTextPosition); 
+      // Set immediately, and ensure it fires again once the image texture fully loads
+      updateTextPosition();
+      texture.once("update", updateTextPosition);
 
       stage5.addChild(descText);
     }
-    sleep = false;
-  }
 
   function clearBigImages() {
     while (stage5.children[0]) {
