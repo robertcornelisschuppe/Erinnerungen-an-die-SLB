@@ -53,20 +53,31 @@
           }
         },
         {
-          "name": "Hofkirche",
+          "name": "Landmann",
           "position": {
             "x": 362,
             "y": 1
           },
           "dimension": {
-            "w": 120,
+            "w": 76,
+            "h": 128
+          }
+        },
+        {
+          "name": "Hofkirche",
+          "position": {
+            "x": 440,
+            "y": 1
+          },
+          "dimension": {
+            "w": 125,
             "h": 128
           }
         },
         {
           "name": "Dissertation_Landmann",
           "position": {
-            "x": 484,
+            "x": 567,
             "y": 1
           },
           "dimension": {
@@ -77,7 +88,7 @@
         {
           "name": "Burgemeister",
           "position": {
-            "x": 569,
+            "x": 652,
             "y": 1
           },
           "dimension": {
@@ -88,7 +99,7 @@
         {
           "name": "Bericht_Zentralkomitee",
           "position": {
-            "x": 657,
+            "x": 740,
             "y": 1
           },
           "dimension": {
@@ -99,7 +110,7 @@
         {
           "name": "Benutzung_Fotothek",
           "position": {
-            "x": 756,
+            "x": 839,
             "y": 1
           },
           "dimension": {
@@ -110,8 +121,8 @@
         {
           "name": "Ausleihvermerk",
           "position": {
-            "x": 879,
-            "y": 1
+            "x": 1,
+            "y": 131
           },
           "dimension": {
             "w": 87,
@@ -121,7 +132,7 @@
         {
           "name": "Ausbau_Garnisonskirche",
           "position": {
-            "x": 1,
+            "x": 90,
             "y": 131
           },
           "dimension": {
@@ -132,7 +143,7 @@
         {
           "name": "TU_Bib",
           "position": {
-            "x": 89,
+            "x": 178,
             "y": 131
           },
           "dimension": {
@@ -143,7 +154,7 @@
         {
           "name": "Hochschule_für_Musik",
           "position": {
-            "x": 219,
+            "x": 308,
             "y": 131
           },
           "dimension": {
@@ -152,20 +163,9 @@
           }
         },
         {
-          "name": "Übergabe_Neubau",
-          "position": {
-            "x": 349,
-            "y": 131
-          },
-          "dimension": {
-            "w": 128,
-            "h": 94
-          }
-        },
-        {
           "name": "Palasthotel",
           "position": {
-            "x": 479,
+            "x": 438,
             "y": 131
           },
           "dimension": {
@@ -176,7 +176,7 @@
         {
           "name": "Sondersammlungen",
           "position": {
-            "x": 609,
+            "x": 568,
             "y": 131
           },
           "dimension": {
@@ -187,7 +187,7 @@
         {
           "name": "Schallplattennutzung",
           "position": {
-            "x": 739,
+            "x": 698,
             "y": 131
           },
           "dimension": {
@@ -198,7 +198,7 @@
         {
           "name": "Marienallee",
           "position": {
-            "x": 869,
+            "x": 828,
             "y": 131
           },
           "dimension": {
@@ -295,9 +295,31 @@
           }
         },
         {
-          "name": "Wachsmatrize",
+          "name": "Übergabe_Neubaz",
           "position": {
             "x": 131,
+            "y": 355
+          },
+          "dimension": {
+            "w": 128,
+            "h": 86
+          }
+        },
+        {
+          "name": "Katalogisierung_Schloss",
+          "position": {
+            "x": 261,
+            "y": 355
+          },
+          "dimension": {
+            "w": 128,
+            "h": 83
+          }
+        },
+        {
+          "name": "Wachsmatrize",
+          "position": {
+            "x": 391,
             "y": 355
           },
           "dimension": {
@@ -308,7 +330,7 @@
         {
           "name": "Bildindex_der_Kunst_und_Architektur_Logo",
           "position": {
-            "x": 261,
+            "x": 521,
             "y": 355
           },
           "dimension": {
