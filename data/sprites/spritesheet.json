@@ -218,9 +218,20 @@
           }
         },
         {
-          "name": "Zeitrschriftenstelle",
+          "name": "Zeitschriftenstelle",
           "position": {
             "x": 131,
+            "y": 261
+          },
+          "dimension": {
+            "w": 128,
+            "h": 91
+          }
+        },
+        {
+          "name": "Zeitrschriftenstelle",
+          "position": {
+            "x": 261,
             "y": 261
           },
           "dimension": {
@@ -231,7 +242,7 @@
         {
           "name": "Musiklesesaal",
           "position": {
-            "x": 261,
+            "x": 391,
             "y": 261
           },
           "dimension": {
@@ -242,7 +253,7 @@
         {
           "name": "Lesesaal",
           "position": {
-            "x": 391,
+            "x": 521,
             "y": 261
           },
           "dimension": {
@@ -253,7 +264,7 @@
         {
           "name": "Dresden_zerstört",
           "position": {
-            "x": 521,
+            "x": 651,
             "y": 261
           },
           "dimension": {
@@ -264,7 +275,7 @@
         {
           "name": "Buchmesse",
           "position": {
-            "x": 651,
+            "x": 781,
             "y": 261
           },
           "dimension": {
@@ -275,8 +286,8 @@
         {
           "name": "Ausleihe",
           "position": {
-            "x": 781,
-            "y": 261
+            "x": 1,
+            "y": 355
           },
           "dimension": {
             "w": 128,
@@ -286,7 +297,7 @@
         {
           "name": "Bundesmann",
           "position": {
-            "x": 1,
+            "x": 131,
             "y": 355
           },
           "dimension": {
@@ -295,9 +306,9 @@
           }
         },
         {
-          "name": "Übergabe_Neubaz",
+          "name": "Übergabe_Neubau",
           "position": {
-            "x": 131,
+            "x": 261,
             "y": 355
           },
           "dimension": {
@@ -308,7 +319,7 @@
         {
           "name": "Katalogisierung_Schloss",
           "position": {
-            "x": 261,
+            "x": 391,
             "y": 355
           },
           "dimension": {
@@ -319,7 +330,7 @@
         {
           "name": "Wachsmatrize",
           "position": {
-            "x": 391,
+            "x": 521,
             "y": 355
           },
           "dimension": {
@@ -330,7 +341,7 @@
         {
           "name": "Bildindex_der_Kunst_und_Architektur_Logo",
           "position": {
-            "x": 521,
+            "x": 651,
             "y": 355
           },
           "dimension": {
