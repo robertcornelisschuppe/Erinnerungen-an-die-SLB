@@ -1911,15 +1911,10 @@ if (d._description) {
         var actualHeight = sprite.height || imageSize3;
         var actualWidth = sprite.width || imageSize3;
 
-        // 2. SOLVE CONSTANT SIZE: Calculate exactly how D3 will fit this image to the screen
-        // 'width' and 'height' are your global Canvas window dimensions
         var screenFitRatio = Math.max(actualWidth / width, actualHeight / height);
 
-        // Apply the counter-scale so it perfectly opposes the final D3 zoom level,
-        // while also shrinking the high-resolution multiplier back down.
         descText.scale.set(screenFitRatio / highResMultiplier);
 
-        // Keep the gap below the image constant on your physical screen too
         var targetScreenGap = 40; // e.g., exactly 40px gap on your monitor
         var gapInPixi = targetScreenGap * screenFitRatio;
 
@@ -1933,6 +1928,8 @@ if (d._description) {
 
       stage5.addChild(descText);
     }
+  sleep = false;
+  }
 
   function clearBigImages() {
     while (stage5.children[0]) {
