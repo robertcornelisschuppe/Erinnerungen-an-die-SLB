@@ -37,9 +37,9 @@
     "canvasBackground": "#fffffff",
     "timelineBackground": "#cc0000",
     "timelineFontColor": "#ffffff",
-    "backgroundHeader": "#87cdd7",
+    "backgroundHeader": "#fafafa",
     "fontColorHeader": "#f8774f",
-    "detailBackground": "#87cdd7",
+    "detailBackground": "#fafafa",
     "infoBackground": "#fafafa",
     "infoFontColor": "#000000",
     "searchbarBackground": "#263338"
