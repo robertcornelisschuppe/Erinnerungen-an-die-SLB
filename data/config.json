@@ -39,10 +39,10 @@
     "timelineFontColor": "#ffffff",
     "backgroundHeader": "#fafafa",
     "fontColorHeader": "#f8774f",
-    "detailBackground": "#fafafa",
-    "infoBackground": "#fafafa",
+    "detailBackground": "#00afc8",
+    "infoBackground": "#00afc8",
     "infoFontColor": "#000000",
-    "searchbarBackground": "#263338"
+    "searchbarBackground": "#00afc8"
   },
   "projection": {
     "columns": 4
