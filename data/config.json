@@ -30,7 +30,7 @@
     }
   },
   "style": {
-    "fontColor": "#fafafa",
+    "fontColor": "#000000",
     "fontColorActive": "#fff",
     "fontBackground": "#263338",
     "textShadow": "1px 1px 0px #263338",
@@ -41,7 +41,7 @@
     "fontColorHeader": "#f8774f",
     "detailBackground": "#87cdd7",
     "infoBackground": "#87cdd7",
-    "infoFontColor": "#fff",
+    "infoFontColor": "#000000",
     "searchbarBackground": "#263338"
   },
   "projection": {
