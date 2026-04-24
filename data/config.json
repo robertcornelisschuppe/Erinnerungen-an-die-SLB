@@ -31,7 +31,7 @@
   },
   "style": {
     "fontColor": "#000000",
-    "fontColorActive": "#cc0000",
+    "fontColorActive": "#87cdd7",
     "fontBackground": "#fafafa",
     "textShadow": "0px 0px 0px #263338",
     "canvasBackground": "#fffffff",
@@ -39,10 +39,10 @@
     "timelineFontColor": "#ffffff",
     "backgroundHeader": "#fafafa",
     "fontColorHeader": "#f8774f",
-    "detailBackground": "#00afc8",
-    "infoBackground": "#00afc8",
+    "detailBackground": "#87cdd7",
+    "infoBackground": "#87cdd7",
     "infoFontColor": "#000000",
-    "searchbarBackground": "#00afc8"
+    "searchbarBackground": "#87cdd7"
   },
   "projection": {
     "columns": 4
