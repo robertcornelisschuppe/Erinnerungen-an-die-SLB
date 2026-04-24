@@ -31,7 +31,7 @@
   },
   "style": {
     "fontColor": "#000000",
-    "fontColorActive": "#cc0000",
+    "fontColorActive": "#00afc8",
     "fontBackground": "#fafafa",
     "textShadow": "0px 0px 0px #263338",
     "canvasBackground": "#fffffff",
