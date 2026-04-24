@@ -91,7 +91,7 @@ canvas {
 .sideLoader {
    /* box-shadow: 0 0px 56px rgba(0, 0, 0, 0.66), 0 0px 6px rgba(0, 0, 0, 0.23); */
    opacity: 1;
-   color: #87cdd7;
+   color: #00afc8;
    z-index: 900;
    position: absolute;
    right: 0;
