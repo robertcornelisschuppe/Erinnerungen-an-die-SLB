@@ -4,7 +4,7 @@
     position: absolute;
     transform-origin: left top;
     font-size: 9px;
-    /* color: #FFF; */
+    color: #cc0000;
     /* backface-visibility: hidden; */
     /* -webkit-backface-visibility: hidden; */
 }
