@@ -1896,7 +1896,7 @@ if (d._description) {
         fontFamily: 'Lato, Arial, sans-serif',
         // Multiply up to create a massive, crisp internal texture
         fontSize: targetScreenFontSize * highResMultiplier, 
-        fill: '#ffffff',
+        fill: '#000000',
         wordWrap: true,
         wordWrapWidth: wrapWidthOnScreen * highResMultiplier,
         align: 'center'
