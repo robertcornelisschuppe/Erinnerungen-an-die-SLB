@@ -1327,10 +1327,15 @@ function zoomToImage(d, duration) {
     var x2 = x1 + widthOuter / scale;
 
     if (d3.event.sourceEvent != null) {
+      // 1. Define the width of your sidebar in pixels (480px based on your CSS)
+      var sidebarOffset = 480; 
+
       if (x1 < 0) {
         translate[0] = 0;
-      } else if (x2 > widthOuter) {
-        translate[0] = (widthOuter * scale - widthOuter) * -1;
+      // 2. Allow x2 to travel further to the right by the offset amount
+      } else if (x2 > widthOuter + (sidebarOffset / scale)) {
+        // 3. Update the hard stop limit to include that new offset space
+        translate[0] = (widthOuter * scale - widthOuter + sidebarOffset) * -1;
       }
 
       zoom.translate([translate[0], translate[1]]);
