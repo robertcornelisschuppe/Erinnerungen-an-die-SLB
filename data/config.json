@@ -33,7 +33,7 @@
     "fontColor": "#000000",
     "fontColorActive": "#fff",
     "fontBackground": "#263338",
-    "textShadow": "1px 1px 0px #263338",
+    /*"textShadow": "1px 1px 0px #263338",*/
     "canvasBackground": "#87cdd7",
     "timelineBackground": "#00afc8",
     "timelineFontColor": "#fafafa",
