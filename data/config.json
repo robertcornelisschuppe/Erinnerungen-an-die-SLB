@@ -32,9 +32,9 @@
   "style": {
     "fontColor": "#000000",
     "fontColorActive": "#fff",
-    "fontBackground": "#FCFCFC",
+    "fontBackground": "#fcfcfc",
     "textShadow": "1px 1px 0px #263338",
-    "canvasBackground": "#FAF5F5",
+    "canvasBackground": "#fcfcfc",
     "timelineBackground": "#00afc8",
     "timelineFontColor": "#fafafa",
     "backgroundHeader": "#87cdd7",
