@@ -40,7 +40,7 @@
     "backgroundHeader": "#87cdd7",
     "fontColorHeader": "#f8774f",
     "detailBackground": "#87cdd7",
-    "infoBackground": "#87cdd7",
+    "infoBackground": "#fafafa",
     "infoFontColor": "#000000",
     "searchbarBackground": "#263338"
   },
