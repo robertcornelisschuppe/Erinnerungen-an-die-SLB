@@ -745,7 +745,7 @@ svg {
 
 .detail .entry .label {
   text-transform: uppercase;
-  color: #fafafa;
+  color: #000000;
   font-weight: 900;
   flex: 1;
   padding-bottom: 3px;
