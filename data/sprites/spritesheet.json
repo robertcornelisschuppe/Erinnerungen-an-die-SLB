@@ -31,9 +31,20 @@
           }
         },
         {
-          "name": "Renate_Ritter",
+          "name": "Stasi_Emblem",
           "position": {
             "x": 186,
+            "y": 1
+          },
+          "dimension": {
+            "w": 85,
+            "h": 128
+          }
+        },
+        {
+          "name": "Renate_Ritter",
+          "position": {
+            "x": 273,
             "y": 1
           },
           "dimension": {
@@ -44,7 +55,7 @@
         {
           "name": "Lenin",
           "position": {
-            "x": 276,
+            "x": 363,
             "y": 1
           },
           "dimension": {
@@ -55,7 +66,7 @@
         {
           "name": "Landmann",
           "position": {
-            "x": 362,
+            "x": 449,
             "y": 1
           },
           "dimension": {
@@ -64,9 +75,20 @@
           }
         },
         {
+          "name": "Klaus_Kempf",
+          "position": {
+            "x": 527,
+            "y": 1
+          },
+          "dimension": {
+            "w": 85,
+            "h": 128
+          }
+        },
+        {
           "name": "Hofkirche",
           "position": {
-            "x": 440,
+            "x": 614,
             "y": 1
           },
           "dimension": {
@@ -77,7 +99,7 @@
         {
           "name": "Dissertation_Landmann",
           "position": {
-            "x": 567,
+            "x": 741,
             "y": 1
           },
           "dimension": {
@@ -86,10 +108,21 @@
           }
         },
         {
+          "name": "df_hauptkatalog_0743286",
+          "position": {
+            "x": 826,
+            "y": 1
+          },
+          "dimension": {
+            "w": 87,
+            "h": 128
+          }
+        },
+        {
           "name": "Demonstrationen",
           "position": {
-            "x": 652,
-            "y": 1
+            "x": 1,
+            "y": 131
           },
           "dimension": {
             "w": 128,
@@ -99,7 +132,7 @@
         {
           "name": "Burgemeister",
           "position": {
-            "x": 782,
+            "x": 915,
             "y": 1
           },
           "dimension": {
@@ -110,8 +143,8 @@
         {
           "name": "Bericht_Zentralkomitee",
           "position": {
-            "x": 870,
-            "y": 1
+            "x": 131,
+            "y": 131
           },
           "dimension": {
             "w": 97,
@@ -121,7 +154,7 @@
         {
           "name": "Benutzung_Fotothek",
           "position": {
-            "x": 1,
+            "x": 230,
             "y": 131
           },
           "dimension": {
@@ -132,7 +165,7 @@
         {
           "name": "Ausleihvermerk",
           "position": {
-            "x": 124,
+            "x": 353,
             "y": 131
           },
           "dimension": {
@@ -143,7 +176,7 @@
         {
           "name": "Ausbau_Garnisonskirche",
           "position": {
-            "x": 213,
+            "x": 442,
             "y": 131
           },
           "dimension": {
@@ -152,9 +185,31 @@
           }
         },
         {
+          "name": "4724928731",
+          "position": {
+            "x": 530,
+            "y": 131
+          },
+          "dimension": {
+            "w": 111,
+            "h": 128
+          }
+        },
+        {
+          "name": "Gorbitz",
+          "position": {
+            "x": 643,
+            "y": 131
+          },
+          "dimension": {
+            "w": 128,
+            "h": 127
+          }
+        },
+        {
           "name": "TU_Bib",
           "position": {
-            "x": 301,
+            "x": 773,
             "y": 131
           },
           "dimension": {
@@ -165,8 +220,8 @@
         {
           "name": "Tonstudio",
           "position": {
-            "x": 431,
-            "y": 131
+            "x": 1,
+            "y": 261
           },
           "dimension": {
             "w": 128,
@@ -176,8 +231,19 @@
         {
           "name": "Hochschule_für_Musik",
           "position": {
-            "x": 561,
-            "y": 131
+            "x": 131,
+            "y": 261
+          },
+          "dimension": {
+            "w": 128,
+            "h": 95
+          }
+        },
+        {
+          "name": "Drepunct",
+          "position": {
+            "x": 261,
+            "y": 261
           },
           "dimension": {
             "w": 128,
@@ -187,8 +253,8 @@
         {
           "name": "Palasthotel",
           "position": {
-            "x": 691,
-            "y": 131
+            "x": 391,
+            "y": 261
           },
           "dimension": {
             "w": 128,
@@ -198,8 +264,8 @@
         {
           "name": "Verabschiedung_Burgemeister",
           "position": {
-            "x": 821,
-            "y": 131
+            "x": 521,
+            "y": 261
           },
           "dimension": {
             "w": 128,
@@ -209,7 +275,7 @@
         {
           "name": "Sondersammlungen",
           "position": {
-            "x": 1,
+            "x": 651,
             "y": 261
           },
           "dimension": {
@@ -220,7 +286,7 @@
         {
           "name": "Schallplattennutzung",
           "position": {
-            "x": 131,
+            "x": 781,
             "y": 261
           },
           "dimension": {
@@ -231,8 +297,8 @@
         {
           "name": "Marienallee",
           "position": {
-            "x": 261,
-            "y": 261
+            "x": 1,
+            "y": 366
           },
           "dimension": {
             "w": 128,
@@ -242,8 +308,19 @@
         {
           "name": "Ferienheim",
           "position": {
-            "x": 391,
-            "y": 261
+            "x": 131,
+            "y": 366
+          },
+          "dimension": {
+            "w": 128,
+            "h": 92
+          }
+        },
+        {
+          "name": "Ausleihe_ZB",
+          "position": {
+            "x": 261,
+            "y": 366
           },
           "dimension": {
             "w": 128,
@@ -253,8 +330,8 @@
         {
           "name": "Zeitschriftenstelle",
           "position": {
-            "x": 521,
-            "y": 261
+            "x": 391,
+            "y": 366
           },
           "dimension": {
             "w": 128,
@@ -264,8 +341,8 @@
         {
           "name": "Musiklesesaal",
           "position": {
-            "x": 651,
-            "y": 261
+            "x": 521,
+            "y": 366
           },
           "dimension": {
             "w": 128,
@@ -273,10 +350,21 @@
           }
         },
         {
+          "name": "Westreisen",
+          "position": {
+            "x": 651,
+            "y": 366
+          },
+          "dimension": {
+            "w": 128,
+            "h": 90
+          }
+        },
+        {
           "name": "Lesesaal",
           "position": {
             "x": 781,
-            "y": 261
+            "y": 366
           },
           "dimension": {
             "w": 128,
@@ -287,7 +375,7 @@
           "name": "Dresden_zerstört",
           "position": {
             "x": 1,
-            "y": 355
+            "y": 460
           },
           "dimension": {
             "w": 128,
@@ -298,7 +386,7 @@
           "name": "Buchmesse",
           "position": {
             "x": 131,
-            "y": 355
+            "y": 460
           },
           "dimension": {
             "w": 128,
@@ -309,7 +397,7 @@
           "name": "Ausleihe",
           "position": {
             "x": 261,
-            "y": 355
+            "y": 460
           },
           "dimension": {
             "w": 128,
@@ -320,7 +408,7 @@
           "name": "Restaurierungswerkstatt",
           "position": {
             "x": 391,
-            "y": 355
+            "y": 460
           },
           "dimension": {
             "w": 128,
@@ -331,7 +419,18 @@
           "name": "Bundesmann",
           "position": {
             "x": 521,
-            "y": 355
+            "y": 460
+          },
+          "dimension": {
+            "w": 128,
+            "h": 89
+          }
+        },
+        {
+          "name": "Ausbau_Garnisonkirche",
+          "position": {
+            "x": 651,
+            "y": 460
           },
           "dimension": {
             "w": 128,
@@ -341,8 +440,8 @@
         {
           "name": "Montagsdemonstration",
           "position": {
-            "x": 651,
-            "y": 355
+            "x": 781,
+            "y": 460
           },
           "dimension": {
             "w": 128,
@@ -352,8 +451,8 @@
         {
           "name": "Übergabe_Neubau",
           "position": {
-            "x": 781,
-            "y": 355
+            "x": 1,
+            "y": 552
           },
           "dimension": {
             "w": 128,
@@ -363,8 +462,8 @@
         {
           "name": "Eingliederung_Fotothek",
           "position": {
-            "x": 1,
-            "y": 447
+            "x": 131,
+            "y": 552
           },
           "dimension": {
             "w": 128,
@@ -372,10 +471,43 @@
           }
         },
         {
+          "name": "Erster_Spatenstich",
+          "position": {
+            "x": 261,
+            "y": 552
+          },
+          "dimension": {
+            "w": 128,
+            "h": 85
+          }
+        },
+        {
+          "name": "Sowjetsoldaten",
+          "position": {
+            "x": 391,
+            "y": 552
+          },
+          "dimension": {
+            "w": 128,
+            "h": 84
+          }
+        },
+        {
           "name": "Katalogisierung_Schloss",
           "position": {
-            "x": 131,
-            "y": 447
+            "x": 521,
+            "y": 552
+          },
+          "dimension": {
+            "w": 128,
+            "h": 83
+          }
+        },
+        {
+          "name": "AL_Runde",
+          "position": {
+            "x": 651,
+            "y": 552
           },
           "dimension": {
             "w": 128,
@@ -385,8 +517,8 @@
         {
           "name": "Wachsmatrize",
           "position": {
-            "x": 261,
-            "y": 447
+            "x": 781,
+            "y": 552
           },
           "dimension": {
             "w": 128,
@@ -396,8 +528,8 @@
         {
           "name": "Bildindex_der_Kunst_und_Architektur_Logo",
           "position": {
-            "x": 391,
-            "y": 447
+            "x": 1,
+            "y": 640
           },
           "dimension": {
             "w": 128,
