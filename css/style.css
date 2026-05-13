@@ -1031,3 +1031,25 @@ textarea:focus, input:focus{
     width: 100%;
     height: 100%;
 }
+
+@media (max-width: 768px) {
+  .detail {
+    width: 100% !important;
+    right: 0;
+  }
+  
+  .detail.hide {
+    right: -100% !important; /* Slide completely off screen */
+  }
+
+  /* Adjust padding for small screens so text isn't squashed */
+  .detail .inner > div {
+    padding: 20px !important;
+  }
+
+  /* Make sure the visualization container takes full height */
+  .viz {
+    width: 100vw;
+    height: 100vh;
+  }
+}
