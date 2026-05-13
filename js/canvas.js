@@ -108,7 +108,7 @@ function Canvas() {
   var startScale = 0;
   var cursorCutoff = 1;
   var zooming = false;
-  var detailContainer = d3.select(".sidebar");
+  var detailContainer = d3.select(".detail");
   var timelineData;
   var stage, stage1, stage2, stage3, stage4, stage5;
   var timelineHover = false;
@@ -506,30 +506,6 @@ canvas.loadMedia = function (d) {
   canvas.x = x;
   canvas.y = yscale;
 
-canvas.resize = function () {
-    // 1. NEW: Check if we are in fullscreen mode. 
-    // If a video is fullscreen, do NOT reset the canvas!
-    if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
-        return;
-    }
-
-    if (!state.init) return;
-    
-    width = window.innerWidth - margin.left - margin.right;
-    height = window.innerHeight // < minHeight ? minHeight : window.innerHeight;
-    widthOuter = window.innerWidth;
-    renderer.resize(width + margin.left + margin.right, height);
-    zoom.size([width, height]);
-    canvas.makeScales();
-    canvas.project();
-    
-    // This was the line causing the "jump back"
-    canvas.resetZoom(); 
-    
-    console.log("dimensions", width, height);
-    console.log("self.innerWidth", self.innerWidth, self.innerHeight);
-  };
-
   canvas.makeScales = function () {
     x.rangeBands([margin.left, width + margin.left], 0.2);
 
@@ -634,7 +610,7 @@ canvas.resize = function () {
     container = d3.select(".page").append("div").classed("viz", true);
     detailVue._data.structure = config.detail.structure;
 
-    var detailInner = d3.select(".sidebar .inner");
+    var detailInner = d3.select(".detail .inner");
     mediaPlayerContainer = detailInner.append("div")
         .classed("media-player-container", true);   
     
@@ -646,33 +622,44 @@ canvas.resize = function () {
       imageSize3 = config.loader.textures.big.size;
     }
 
+  canvas.resize = function () {
+    // 1. Prevent reset if we are in fullscreen (e.g. watching a video)
+    if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+        return;
+    }
 
-  canvas.resize = function() {
+    if (!state.init) return;
+
+    // 2. Update dimensions
     widthOuter = window.innerWidth;
     width = widthOuter - margin.left - margin.right;
     height = window.innerHeight;
+    
+    // 3. Update resolution (Crucial for Browser Zoom fixes)
+    resolution = window.devicePixelRatio || 1;
 
-    // Update PIXI renderer size
+    // 4. Update the Renderer and D3 Zoom
     if (renderer) {
       renderer.resize(widthOuter, height);
     }
-
-    // Update D3 scale range
-    if (x) {
-      x.rangeBands([margin.left, width + margin.left], 0.2);
-    }
-
-    // Update D3 zoom size
     if (zoom) {
       zoom.size([width, height]);
     }
 
-    // Update the visual clipping boundaries in the zoomed() function
+    // 5. Recalculate scales and RE-PROJECT the items to the new grid
+    canvas.makeScales();
+    canvas.project(); // <--- This fixes the "screwed up" layout!
+
+    // 6. Refresh the view
     sleep = false;
     if (typeof animate === "function") animate();
+    
+    console.log("Resized to:", widthOuter, "x", height, "at resolution", resolution);
   };
 
+  // Attach the listener once
   window.addEventListener("resize", canvas.resize);
+    
 
 var renderOptions = {
       resolution: resolution,
