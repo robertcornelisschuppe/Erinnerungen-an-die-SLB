@@ -646,11 +646,33 @@ canvas.resize = function () {
       imageSize3 = config.loader.textures.big.size;
     }
 
-    // PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-    // PIXI.settings.SPRITE_MAX_TEXTURES = Math.min(
-    //   PIXI.settings.SPRITE_MAX_TEXTURES,
-    //   16
-    // );
+
+  canvas.resize = function() {
+    widthOuter = window.innerWidth;
+    width = widthOuter - margin.left - margin.right;
+    height = window.innerHeight;
+
+    // Update PIXI renderer size
+    if (renderer) {
+      renderer.resize(widthOuter, height);
+    }
+
+    // Update D3 scale range
+    if (x) {
+      x.rangeBands([margin.left, width + margin.left], 0.2);
+    }
+
+    // Update D3 zoom size
+    if (zoom) {
+      zoom.size([width, height]);
+    }
+
+    // Update the visual clipping boundaries in the zoomed() function
+    sleep = false;
+    if (typeof animate === "function") animate();
+  };
+
+  window.addEventListener("resize", canvas.resize);
 
 var renderOptions = {
       resolution: resolution,
