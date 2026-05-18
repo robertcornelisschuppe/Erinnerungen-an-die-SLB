@@ -622,45 +622,63 @@ canvas.loadMedia = function (d) {
       imageSize3 = config.loader.textures.big.size;
     }
 
-  canvas.resize = function () {
-    // 1. Prevent reset if we are in fullscreen (e.g. watching a video)
+
+   canvas.resize = function () {
     if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
         return;
     }
 
     if (!state.init) return;
 
-    // 2. Update dimensions
+    var oldWidth = width;
+
     widthOuter = window.innerWidth;
     width = widthOuter - margin.left - margin.right;
     height = window.innerHeight;
     
-    // 3. Update resolution (Crucial for Browser Zoom fixes)
     resolution = window.devicePixelRatio || 1;
 
-    // 4. Update the Renderer and D3 Zoom
-    if (renderer) {
-      renderer.resize(widthOuter, height);
-    }
-    if (zoom) {
-      zoom.size([width, height]);
-    }
+    if (renderer) renderer.resize(widthOuter, height);
+    if (zoom) zoom.size([width, height]);
 
-    // 5. Recalculate scales and RE-PROJECT the items to the new grid
+    var widthRatio = oldWidth > 0 ? width / oldWidth : 1;
+
     canvas.makeScales();
-    canvas.project(); // <--- This fixes the "screwed up" layout!
+    canvas.project();
 
-    // 6. Refresh the view
+    data.forEach(function(d) {
+      if (d.sprite) {
+        d.sprite.position.x = d.x1;
+        d.sprite.position.y = d.y1;
+      }
+      if (d.sprite2) {
+        d.sprite2.position.x = d.x * scale2 + imageSize2 / 2;
+        d.sprite2.position.y = d.y * scale2 + imageSize2 / 2;
+      }
+    });
+    
+    if (canvas.updateBorderPositions) canvas.updateBorderPositions();
+
+    if (zoomedToImage && selectedImage) {
+      // If zoomed into an image, wipe the old text/image and instantly re-center.
+      // This also forces the text to re-wrap perfectly to the new screen width!
+      if (typeof clearBigImages === "function") clearBigImages();
+      canvas.zoomToImage(selectedImage, 0); 
+    } else {
+      // If viewing the grid, scale the camera shift perfectly with the window
+      translate[0] = translate[0] * widthRatio;
+      translate[1] = translate[1] * widthRatio;
+      
+      zoom.translate(translate);
+      stage2.x = translate[0];
+      stage2.y = translate[1];
+    }
+
     sleep = false;
     if (typeof animate === "function") animate();
-    
-    console.log("Resized to:", widthOuter, "x", height, "at resolution", resolution);
   };
 
-  // Attach the listener once
   window.addEventListener("resize", canvas.resize);
-    
-
 var renderOptions = {
       resolution: resolution,
       antialiasing: true,
