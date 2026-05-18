@@ -475,6 +475,7 @@ canvas.setView = function (ids, duration) {
                 loadBigImage(d, "click");
                 hideTheRest(d);
                 
+                // --- FIX: Proper variable scope initialization inside the callback ---
                 var settledFrames = 5;
                 
                 function settleLayout() {
@@ -488,7 +489,7 @@ canvas.setView = function (ids, duration) {
             }
         });
 };
-
+  
   canvas.rangeBand = function () {
     return rangeBand;
   };
