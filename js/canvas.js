@@ -416,11 +416,29 @@ canvas.setView = function (ids, duration) {
     var items = data.filter(function (d) { return ids.includes(d.id); });
     if (!items.length) return;
 
+    // If it's a single item view, let our robust click handler logic do the math
+    // so it perfectly matches the user interaction state and doesn't get stuck!
+    if (items.length == 1) {
+        var d = items[0];
+        selectedImage = d;
+        
+        if (typeof zoomToImage === "function") {
+            zoomToImage(d, duration);
+            
+            // Trigger the sidebar video and details simultaneously
+            showDetail(d);
+            canvas.loadMedia(d);
+            loadBigImage(d, "click");
+            hideTheRest(d);
+            return;
+        }
+    }
+
+    // --- Fallback Bounding Box Zoom (For Multi-Item selections) ---
     vizContainer.style("pointer-events", "none");
     zoom.center(null);
     state.zoomingToImage = true;
 
-    // Compute the bounding box of all selected items
     var xs = items.map(function (d) { return d.x; });
     var ys = items.map(function (d) { return d.y; });
 
@@ -432,63 +450,42 @@ canvas.setView = function (ids, duration) {
     var width = canvas.width();
     var height = canvas.height();
 
-    // Use rangeBandImage for padding/spacing logic
     var padding = rangeBandImage / 2;
     var boxWidth = maxX - minX + padding * 2;
     var boxHeight = maxY - minY + padding * 2;
 
-    // Calculate center 
     var centerX = (minX + maxX) / 2;
     var centerY = (minY + maxY) / 2;
 
-    // Calculate scale to fit the bounding box
-    var scale = 0.9 / Math.max(boxWidth / width, boxHeight / height); // Fit box in 90% of view
+    var scale = 0.9 / Math.max(boxWidth / width, boxHeight / height);
 
-    // CORRECTED TRANSLATE CALCULATION
     var translateTarget = [
         (width - 700) / 2 - scale * centerX,
         height / 2 - scale * centerY
     ];
 
-    if (items.length == 1) {
-        zoomedToImageScale = scale;
-    }
-
     vizContainer
         .interrupt()
-        .call(zoom.translate(translate).event) // Use current translate as starting point
+        .call(zoom.translate(translate).event)
         .transition()
         .duration(duration)
-        .call(zoom.scale(scale).translate(translateTarget).event) // Apply new scale and target translate
+        .call(zoom.scale(scale).translate(translateTarget).event)
         .each("end", function () {
             state.zoomingToImage = false;
             vizContainer.style("pointer-events", "auto");
             
-            if (items.length == 1) {
-                var d = items[0];
-                zoomedToImage = true;
-                selectedImage = d;
-                zoomedToImageScale = scale;
-
-                showDetail(d);
-                canvas.loadMedia(d); // Sidebar video embeds load immediately
-                loadBigImage(d, "click");
-                hideTheRest(d);
-                
-                // --- FIX: Proper variable scope initialization inside the callback ---
-                var settledFrames = 5;
-                
-                function settleLayout() {
-                    sleep = false;
-                    if (typeof animate === "function") animate();
-                    if (settledFrames-- > 0) {
-                        requestAnimationFrame(settleLayout);
-                    }
+            var settledFrames = 5;
+            function settleLayout() {
+                sleep = false;
+                if (typeof animate === "function") animate();
+                if (settledFrames-- > 0) {
+                    requestAnimationFrame(settleLayout);
                 }
-                settleLayout();
             }
+            settleLayout();
         });
 };
+
   
   canvas.rangeBand = function () {
     return rangeBand;
