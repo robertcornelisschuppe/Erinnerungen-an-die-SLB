@@ -602,7 +602,7 @@ canvas.setView = function (ids, duration) {
   //   console.log("timeDomain", timeDomain);
   // }
 
-  canvas.init = function (_data, _timeline, _config) {
+canvas.init = function (_data, _timeline, _config) {
     data = _data;
     config = _config;
     timelineData = _timeline;
@@ -622,93 +622,84 @@ canvas.setView = function (ids, duration) {
       imageSize3 = config.loader.textures.big.size;
     }
 
-canvas.resize = function () {
-    if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
-        return;
-    }
+    canvas.resize = function () {
+        if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+            return;
+        }
 
-    if (!state.init) return;
+        if (!state.init) return;
 
-    // 1. Save old dimensions AND the old camera Y position before we change anything
-    var oldWidth = width;
-    var oldHeight = height;
-    var oldTranslateY = translate[1];
+        // 1. Save old dimensions AND the old camera Y position before we change anything
+        var oldWidth = width;
+        var oldHeight = height;
+        var oldTranslateY = translate[1];
 
-    widthOuter = window.innerWidth;
-    width = widthOuter - margin.left - margin.right;
-    height = window.innerHeight;
-    
-    resolution = window.devicePixelRatio || 1;
+        widthOuter = window.innerWidth;
+        width = widthOuter - margin.left - margin.right;
+        height = window.innerHeight;
+        
+        resolution = window.devicePixelRatio || 1;
 
-    if (renderer) {
-      // FIX 1: Update the internal renderer resolution to match the new browser zoom
-      renderer.resolution = resolution;
-      renderer.resize(widthOuter, height);
-      
-      // FIX 2: Explicitly update the canvas's CSS style dimensions to prevent stretching/squashing
-      renderer.view.style.width = widthOuter + "px";
-      renderer.view.style.height = height + "px";
-    }
-    if (zoom) zoom.size([width, height]);
+        if (renderer) {
+          // FIX 1: Update the internal renderer resolution to match the new browser zoom
+          renderer.resolution = resolution;
+          renderer.resize(widthOuter, height);
+          
+          // FIX 2: Explicitly update the canvas's CSS style dimensions to prevent stretching/squashing
+          renderer.view.style.width = widthOuter + "px";
+          renderer.view.style.height = height + "px";
+        }
+        if (zoom) zoom.size([width, height]);
 
-    var widthRatio = oldWidth > 0 ? width / oldWidth : 1;
+        var widthRatio = oldWidth > 0 ? width / oldWidth : 1;
 
-    canvas.makeScales();
-    canvas.project();
+        canvas.makeScales();
+        canvas.project();
 
-    data.forEach(function(d) {
-      if (d.sprite) {
-        d.sprite.position.x = d.x1;
-        d.sprite.position.y = d.y1;
-      }
-      if (d.sprite2) {
-        d.sprite2.position.x = d.x * scale2 + imageSize2 / 2;
-        d.sprite2.position.y = d.y * scale2 + imageSize2 / 2;
-      }
-    });
-    
-    if (canvas.updateBorderPositions) canvas.updateBorderPositions();
+        data.forEach(function(d) {
+          if (d.sprite) {
+            d.sprite.position.x = d.x1;
+            d.sprite.position.y = d.y1;
+          }
+          if (d.sprite2) {
+            d.sprite2.position.x = d.x * scale2 + imageSize2 / 2;
+            d.sprite2.position.y = d.y * scale2 + imageSize2 / 2;
+          }
+        });
+        
+        if (canvas.updateBorderPositions) canvas.updateBorderPositions();
 
-    if (zoomedToImage && selectedImage) {
-      if (typeof clearBigImages === "function") clearBigImages();
-      
-      // FIX 3: Remove "canvas." prefix to reference the correct local closure function safely
-      if (typeof zoomToImage === "function") {
-        zoomToImage(selectedImage, 0); 
-      } else if (canvas.setView) {
-        canvas.setView([selectedImage.id], 0); // Graceful fallback to public method
-      }
-    } else {
-      // 2. PERFECT CAMERA MATH: 
-      // X scales purely by width, but Y has to account for the grid shifting by width 
-      // AND the stage origin shifting by height simultaneously!
-      translate[0] = translate[0] * widthRatio;
-      translate[1] = (height / 2) - ((oldHeight / 2 - oldTranslateY - oldHeight * scale) * widthRatio) - (height * scale);
-      
-      zoom.translate(translate);
-      stage2.x = translate[0];
-      stage2.y = translate[1];
-    }
+        if (zoomedToImage && selectedImage) {
+          if (typeof clearBigImages === "function") clearBigImages();
+          
+          // Reference the public component framework safely
+          if (canvas.setView) {
+            canvas.setView([selectedImage.id], 0); 
+          }
+        } else {
+          // 2. PERFECT CAMERA MATH: 
+          translate[0] = translate[0] * widthRatio;
+          translate[1] = (height / 2) - ((oldHeight / 2 - oldTranslateY - oldHeight * scale) * widthRatio) - (height * scale);
+          
+          zoom.translate(translate);
+          stage2.x = translate[0];
+          stage2.y = translate[1];
+        }
 
-    sleep = false;
-    if (typeof animate === "function") animate();
-  };
-    
-window.addEventListener("resize", canvas.resize);
-    
-var renderOptions = {
+        sleep = false;
+        if (typeof animate === "function") animate();
+    };
+        
+    window.addEventListener("resize", canvas.resize);
+        
+    var renderOptions = {
       resolution: resolution,
       antialiasing: true,
-      transparent: true,  // <--- NEW: Allows CSS background to show through!
+      transparent: true,  // <--- Allows CSS background to show through!
       width: width + margin.left + margin.right,
       height: height,
     };
     renderer = new PIXI.Renderer(renderOptions);
-    
-    // renderer.backgroundColor = parseInt(
-    //   config.style.canvasBackground.substring(1),
-    //   16
-    // );
     
     window.renderer = renderer;
 
@@ -728,8 +719,6 @@ var renderOptions = {
     stage2.addChild(stage5);
 
     canvas.initGroupLayout();
-
-    //canvas.makeScales();
 
     // add preview pics
     data.forEach(function (d, i) {
@@ -759,46 +748,18 @@ var renderOptions = {
         mousemove(d);
         touchstart = new Date() * 1;
       })
-      // .on("touchend", function (d, i, nodes, event) {
-      //   var touchtime = new Date() * 1 - touchstart;
-      //   if (touchtime < 20) {
-      //     console.log("touched", touchtime, d, i, nodes, event);
-      //     return;
-      //   }
-      // })
-      // .on("touchend", function (d) {
-      //   var touchtime = new Date() * 1 - touchstart;
-      //   if (touchtime > 250) {
-      //     console.log("longtouch", touchtime);
-      //     return;
-      //   }
-      //   if (selectedImageDistance > 15) return;
-      //   if (selectedImage && !selectedImage.id) return;
-      //   if (drag) return;
-
-      //   console.log("touch zoom")
-
-      //   // if (Math.abs(zoomedToImageScale - scale) < 0.1) {
-      //   //   canvas.resetZoom();
-      //   // } else {
-      //   //   zoomToImage(selectedImage, 1400 / Math.sqrt(Math.sqrt(scale)));
-      //   // }
-
-      //   // zoomToImage(selectedImage, 1400 / Math.sqrt(Math.sqrt(scale)));
-      // })
       .on("click", function () {
 
         if (d3.event.shiftKey) {
           console.log("shift click", selectedImage);
           canvas.addBorderToImage(selectedImage);
-          return
+          return;
         }
         if (d3.event.ctrlKey || d3.event.metaKey) {
           console.log("ctrl/cmd click");
-          // if alt or cmd is pressed, startNew vector
           var startNew = d3.event.altKey;
           canvas.addVector(startNew);
-          return
+          return;
         }
 
         var clicktime = new Date() * 1 - lastClick;
@@ -816,15 +777,16 @@ var renderOptions = {
         if (selectedImageDistance > cursorCutoff) return;
         if (selectedImage && selectedImage.active === false) return;
         if (timelineHover) return;
-        // console.log(selectedImage)
+        
         userInteraction = true;
 
         if (Math.abs(zoomedToImageScale - scale) < 0.1) {
           canvas.resetZoom();
-          // console.log("reset zoom")
         } else {
-          // console.log("zoom to image", zoomedToImageScale, scale)
-          zoomToImage(selectedImage, 1400 / Math.sqrt(Math.sqrt(scale)));
+          // FIX: Redirect single clicks directly into our robust setView architecture 
+          // to open the sidebar detail layout and center up perfectly.
+          var calcDuration = Math.round(1400 / Math.sqrt(Math.sqrt(scale)));
+          canvas.setView([selectedImage.id], calcDuration);
         }
       });
 
@@ -833,9 +795,6 @@ var renderOptions = {
       if (window.top == window.self) d3.event.preventDefault();
     });
 
-
-    //canvas.makeScales();
-    //canvas.project();
     animate();
 
     state.init = true;
@@ -846,18 +805,16 @@ var renderOptions = {
           event.preventDefault();
           event.stopPropagation();
           
-          // Clear the URL hash
           if (typeof utils !== "undefined" && utils.updateHash) {
               utils.updateHash("ids", "");
           }
           
-          // Let our newly bulletproofed function handle the rest
           canvas.resetZoom(); 
         }
       }
     }, true);
-  }; // <-- Make sure this closing bracket for canvas.init stays!
-
+  };
+  
   var imageBorders = {};
 
   canvas.updateBorderPositions = function () {
