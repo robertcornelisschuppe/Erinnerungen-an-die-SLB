@@ -622,7 +622,6 @@ canvas.loadMedia = function (d) {
       imageSize3 = config.loader.textures.big.size;
     }
 
-
 canvas.resize = function () {
     if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
         return;
@@ -641,7 +640,15 @@ canvas.resize = function () {
     
     resolution = window.devicePixelRatio || 1;
 
-    if (renderer) renderer.resize(widthOuter, height);
+    if (renderer) {
+      // FIX 1: Update the internal renderer resolution to match the new browser zoom
+      renderer.resolution = resolution;
+      renderer.resize(widthOuter, height);
+      
+      // FIX 2: Explicitly update the canvas's CSS style dimensions to prevent stretching/squashing
+      renderer.view.style.width = widthOuter + "px";
+      renderer.view.style.height = height + "px";
+    }
     if (zoom) zoom.size([width, height]);
 
     var widthRatio = oldWidth > 0 ? width / oldWidth : 1;
@@ -664,7 +671,13 @@ canvas.resize = function () {
 
     if (zoomedToImage && selectedImage) {
       if (typeof clearBigImages === "function") clearBigImages();
-      canvas.zoomToImage(selectedImage, 0); 
+      
+      // FIX 3: Remove "canvas." prefix to reference the correct local closure function safely
+      if (typeof zoomToImage === "function") {
+        zoomToImage(selectedImage, 0); 
+      } else if (canvas.setView) {
+        canvas.setView([selectedImage.id], 0); // Graceful fallback to public method
+      }
     } else {
       // 2. PERFECT CAMERA MATH: 
       // X scales purely by width, but Y has to account for the grid shifting by width 
@@ -680,7 +693,9 @@ canvas.resize = function () {
     sleep = false;
     if (typeof animate === "function") animate();
   };
-  window.addEventListener("resize", canvas.resize);
+    
+window.addEventListener("resize", canvas.resize);
+    
 var renderOptions = {
       resolution: resolution,
       antialiasing: true,
