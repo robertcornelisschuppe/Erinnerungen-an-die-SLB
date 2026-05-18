@@ -451,12 +451,6 @@ canvas.loadMedia = function (d) {
       height / 2 - scale * (height + centerY + padding),
     ];
 
-    // old code
-    // const translateOriginal = [
-    //   -scale * (centerX - padding) - (Math.max(width, height) * 0.3) / 2 + margin.left,
-    //   -scale * (height + centerY + padding) - margin.top + height / 2,
-    // ];
-
     if (items.length == 1) {
       zoomedToImageScale = scale;
       // var d = items[0];
@@ -465,7 +459,7 @@ canvas.loadMedia = function (d) {
       // }, duration / 2);
     }
 
-    vizContainer
+vizContainer
       .interrupt()
       .call(zoom.translate(translate).event) // Use current translate as starting point
       .transition()
@@ -481,12 +475,20 @@ canvas.loadMedia = function (d) {
           zoomedToImageScale = scale;
 
           showDetail(d);
+          canvas.loadMedia(d); // FIX: Restored this call so the sidebar video embeds load immediately!
           loadBigImage(d, "click");
           hideTheRest(d);
+          
+          // FIX: Keep the loop running for 5 frames to settle the layout dimensions perfectly
+          var settledFrames = 5;
+          function settleLayout() {
+            sleep = false;
+            if (typeof animate === "function") animate();
+            if (settledFrames-- > 0) requestAnimationFrame(settleLayout);
+          }
+          settleLayout();
         }
       });
-  };
-
   canvas.rangeBand = function () {
     return rangeBand;
   };
