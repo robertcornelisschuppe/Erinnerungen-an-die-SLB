@@ -1956,19 +1956,19 @@ if (d._description) {
       descText.anchor.y = 0;
       descText.position.x = d.x * scale3 + imageSize3 / 2;
 
-      var updateTextPosition = function() {
+    var updateTextPosition = function() {
         var actualHeight = sprite.height || imageSize3;
-        var actualWidth = sprite.width || imageSize3;
-
-        var screenFitRatio = Math.max(actualWidth / width, actualHeight / height);
-
-        descText.scale.set(screenFitRatio / highResMultiplier);
-
-        var targetScreenGap = 40; // e.g., exactly 40px gap on your monitor
-        var gapInPixi = targetScreenGap * screenFitRatio;
-
-        descText.position.y = (d.y * scale3 + imageSize3 / 2) + (actualHeight / 2) + gapInPixi;
-        sleep = false;
+        
+        // 3. We also multiply the gap by the scale factor so the spacing stays constant!
+        var gap = 80 * sf; 
+        
+        descText.position.y = (d.y * scale3 + imageSize3 / 2) + (actualHeight / 2) + gap;
+        
+        // If the canvas loop is asleep when the texture finishes loading, wake it up immediately
+        if (sleep) {
+          sleep = false;
+          animate();
+        }
       };
 
       // Set immediately, and ensure it fires again once the image texture fully loads
