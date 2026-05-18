@@ -623,14 +623,17 @@ canvas.loadMedia = function (d) {
     }
 
 
-   canvas.resize = function () {
+canvas.resize = function () {
     if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
         return;
     }
 
     if (!state.init) return;
 
+    // 1. Save old dimensions AND the old camera Y position before we change anything
     var oldWidth = width;
+    var oldHeight = height;
+    var oldTranslateY = translate[1];
 
     widthOuter = window.innerWidth;
     width = widthOuter - margin.left - margin.right;
@@ -660,14 +663,14 @@ canvas.loadMedia = function (d) {
     if (canvas.updateBorderPositions) canvas.updateBorderPositions();
 
     if (zoomedToImage && selectedImage) {
-      // If zoomed into an image, wipe the old text/image and instantly re-center.
-      // This also forces the text to re-wrap perfectly to the new screen width!
       if (typeof clearBigImages === "function") clearBigImages();
       canvas.zoomToImage(selectedImage, 0); 
     } else {
-      // If viewing the grid, scale the camera shift perfectly with the window
+      // 2. PERFECT CAMERA MATH: 
+      // X scales purely by width, but Y has to account for the grid shifting by width 
+      // AND the stage origin shifting by height simultaneously!
       translate[0] = translate[0] * widthRatio;
-      translate[1] = translate[1] * widthRatio;
+      translate[1] = (height / 2) - ((oldHeight / 2 - oldTranslateY - oldHeight * scale) * widthRatio) - (height * scale);
       
       zoom.translate(translate);
       stage2.x = translate[0];
@@ -677,7 +680,6 @@ canvas.loadMedia = function (d) {
     sleep = false;
     if (typeof animate === "function") animate();
   };
-
   window.addEventListener("resize", canvas.resize);
 var renderOptions = {
       resolution: resolution,
