@@ -459,8 +459,9 @@ canvas.setView = function (ids, duration) {
 
     var scale = 0.9 / Math.max(boxWidth / width, boxHeight / height);
 
+    var currentSidebarWidth = Math.min(700, widthOuter * 0.4);
     var translateTarget = [
-        (width - 700) / 2 - scale * centerX,
+        (width - currentSidebarWidth) / 2 - scale * centerX,
         height / 2 - scale * centerY
     ];
 
@@ -1204,13 +1205,14 @@ function zoomToImage(d, duration) {
         scale = scale * (maxScreenHeight / screenImageHeight);
     }
     
-    var visibleCenter = (width - 700) / 2;
+    var currentSidebarWidth = Math.min(700, widthOuter * 0.4);
+    var visibleCenter = (width - currentSidebarWidth) / 2;
 
     var translateNow = [
         visibleCenter - scale * (d.x + padding),
         height / 2 - scale * (height + d.y + padding)
     ];
-
+  
     zoomedToImageScale = scale;
 
     setTimeout(function () {
@@ -1328,14 +1330,11 @@ function zoomToImage(d, duration) {
     var x2 = x1 + widthOuter / scale;
 
     if (d3.event.sourceEvent != null) {
-      // 1. Define the width of your sidebar in pixels (480px based on your CSS)
-      var sidebarOffset = 480; 
+      var sidebarOffset = Math.min(480, widthOuter * 0.4);
 
       if (x1 < 0) {
         translate[0] = 0;
-      // 2. Allow x2 to travel further to the right by the offset amount
       } else if (x2 > widthOuter + (sidebarOffset / scale)) {
-        // 3. Update the hard stop limit to include that new offset space
         translate[0] = (widthOuter * scale - widthOuter + sidebarOffset) * -1;
       }
 
