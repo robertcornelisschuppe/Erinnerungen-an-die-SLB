@@ -1895,12 +1895,10 @@ if (d._description) {
       var targetScreenFontSize = 32;
 
       // We wrap the text based on your browser window's width so it's always readable
-      // 'width' is the global variable already defined at the top of canvas.js
       var wrapWidthOnScreen = width * 0.8; // 80% of the screen width
 
       var style = new PIXI.TextStyle({
         fontFamily: 'Lato, Arial, sans-serif',
-        // Multiply up to create a massive, crisp internal texture
         fontSize: targetScreenFontSize * highResMultiplier, 
         fill: '#000000',
         wordWrap: true,
@@ -1913,19 +1911,27 @@ if (d._description) {
       descText.anchor.y = 0;
       descText.position.x = d.x * scale3 + imageSize3 / 2;
 
-    var updateTextPosition = function() {
+      var updateTextPosition = function() {
         var actualHeight = sprite.height || imageSize3;
+        var actualWidth = sprite.width || imageSize3;
+
+        // Calculate how the image scales to the screen to match text scaling
+        var screenFitRatio = Math.max(actualWidth / width, actualHeight / height);
+        descText.scale.set(screenFitRatio / highResMultiplier);
+
+        var targetScreenGap = 40; 
+        var gapInPixi = targetScreenGap * screenFitRatio;
         
-        // 3. We also multiply the gap by the scale factor so the spacing stays constant!
-        var gap = 80 * sf; 
+        descText.position.y = (d.y * scale3 + imageSize3 / 2) + (actualHeight / 2) + gapInPixi;
         
-        descText.position.y = (d.y * scale3 + imageSize3 / 2) + (actualHeight / 2) + gap;
-        
-        // If the canvas loop is asleep when the texture finishes loading, wake it up immediately
-        if (sleep) {
+        // KEEP AWAKE: Keep the canvas rendering for 5 frames to prevent the "requires a click to snap" bug
+        var textureFrames = 5;
+        function settleTexturePosition() {
           sleep = false;
-          animate();
+          if (typeof animate === "function") animate();
+          if (textureFrames-- > 0) requestAnimationFrame(settleTexturePosition);
         }
+        settleTexturePosition();
       };
 
       // Set immediately, and ensure it fires again once the image texture fully loads
@@ -1934,7 +1940,7 @@ if (d._description) {
 
       stage5.addChild(descText);
     }
-  sleep = false;
+    sleep = false;
   }
 
   function clearBigImages() {
