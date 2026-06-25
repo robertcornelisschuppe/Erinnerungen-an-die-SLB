@@ -800,20 +800,24 @@ canvas.init = function (_data, _timeline, _config) {
 
     state.init = true;
 
-    window.addEventListener("keydown", function(event) {
-      if (event.key === "Escape" || event.keyCode === 27) {
-        if (zoomedToImage) {
-          event.preventDefault();
-          event.stopPropagation();
-          
-          if (typeof utils !== "undefined" && utils.updateHash) {
-              utils.updateHash("ids", "");
-          }
-          
-          canvas.resetZoom(); 
+window.addEventListener("keydown", function(event) {
+    if (event.key === "Escape" || event.keyCode === 27) {
+      if (zoomedToImage) {
+        // Sidebar is open, reset image specific zoom and close sidebar
+        event.preventDefault();
+        event.stopPropagation();
+        if (typeof utils !== "undefined" && utils.updateHash) {
+          utils.updateHash("ids", "");
         }
+        canvas.resetZoom();
+      } else if (zoom.scale() > 1) {
+        // Sidebar isn't open, but user is freely zoomed in; reset to start view
+        event.preventDefault();
+        event.stopPropagation();
+        canvas.resetZoom();
       }
-    }, true);
+    }
+  }, true);
   };
   
   var imageBorders = {};
