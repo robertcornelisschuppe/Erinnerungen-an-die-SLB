@@ -802,18 +802,18 @@ canvas.init = function (_data, _timeline, _config) {
 
 window.addEventListener("keydown", function(event) {
     if (event.key === "Escape" || event.keyCode === 27) {
-      if (zoomedToImage) {
-        // 1st press (Sidebar is open):
-        // Update the hash to close the sidebar and unfocus the specific image.
-        // We removed canvas.resetZoom() here so it doesn't zoom all the way out yet.
+      // Check the URL directly to see if an item sidebar is currently open
+      var isSidebarOpen = window.location.hash.indexOf("ids=") !== -1;
+
+      if (isSidebarOpen) {
+        // 1st press (or sidebar open): clear the hash to close the sidebar
         event.preventDefault();
         event.stopPropagation();
         if (typeof utils !== "undefined" && utils.updateHash) {
           utils.updateHash("ids", "");
         }
       } else {
-        // 2nd press (or if the sidebar was already manually closed):
-        // We aren't focused on a specific image, so zoom entirely back to the start view.
+        // 2nd press (or sidebar was already closed manually): zoom out to start view
         event.preventDefault();
         event.stopPropagation();
         canvas.resetZoom();
