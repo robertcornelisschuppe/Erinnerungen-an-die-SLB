@@ -504,6 +504,7 @@ canvas.setView = function (ids, duration) {
   canvas.selectedImage = function () {
     return selectedImage;
   };
+  canvas.zoomedToImage = function () { return zoomedToImage; };
   canvas.x = x;
   canvas.y = yscale;
 
@@ -779,17 +780,16 @@ canvas.init = function (_data, _timeline, _config) {
         if (selectedImage && selectedImage.active === false) return;
         if (timelineHover) return;
         
-        userInteraction = true;
+  userInteraction = true;
 
-        if (Math.abs(zoomedToImageScale - scale) < 0.1) {
-          canvas.resetZoom();
-        } else {
-          // FIX: Redirect single clicks directly into our robust setView architecture 
-          // to open the sidebar detail layout and center up perfectly.
-          var calcDuration = Math.round(1400 / Math.sqrt(Math.sqrt(scale)));
-          canvas.setView([selectedImage.id], calcDuration);
-        }
-      });
+  var sidebarOpen = !detailContainer.classed("hide");
+  if (zoomedToImage || sidebarOpen) {
+    canvas.resetZoom();
+  } else if (selectedImage) {
+    var calcDuration = Math.round(1400 / Math.sqrt(Math.sqrt(scale)));
+    canvas.setView([selectedImage.id], calcDuration);
+  }
+});
 
     // disable right click when in edit mode
     vizContainer.on("contextmenu", function () {
@@ -800,21 +800,19 @@ canvas.init = function (_data, _timeline, _config) {
 
     state.init = true;
 
-    window.addEventListener("keydown", function(event) {
-      if (event.key === "Escape" || event.keyCode === 27) {
-        if (zoomedToImage) {
-          event.preventDefault();
-          event.stopPropagation();
-          
-          if (typeof utils !== "undefined" && utils.updateHash) {
-              utils.updateHash("ids", "");
-          }
-          
-          canvas.resetZoom(); 
-        }
+window.addEventListener("keydown", function(event) {
+  if (event.key === "Escape" || event.keyCode === 27) {
+    var sidebarOpen = !detailContainer.classed("hide");
+    if (zoomedToImage || sidebarOpen) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof utils !== "undefined" && utils.updateHash) {
+        utils.updateHash("ids", "");
       }
-    }, true);
-  };
+      canvas.resetZoom();
+    }
+  }
+}, true);
   
   var imageBorders = {};
 
@@ -1710,7 +1708,7 @@ canvas.resetZoom = function (callback) {
     var y = -bottomPadding;
 
     // 1. Instant UI cleanup so it never gets stuck open
-    d3.select(".sidebar").classed("sneak", true);
+    d3.select(".sidebar").classed("sneak", true).classed("hide", true);
     d3.select(".tagcloud").classed("hide", false);
     if (typeof clearBigImages === "function") clearBigImages();
 
