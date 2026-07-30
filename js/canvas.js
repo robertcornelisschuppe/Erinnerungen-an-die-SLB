@@ -33,6 +33,8 @@ function Canvas() {
 
   var resolution = window.devicePixelRatio || 1;
 
+  var isResetting = false;
+
   var x = d3.scale
     .ordinal()
     .rangeBands([margin.left, width + margin.left], 0.2);
@@ -1338,7 +1340,10 @@ function Canvas() {
     }
   }
 
-  canvas.onhashchange = function () {
+canvas.onhashchange = function () {
+    // Falls wir gerade herauszoomen, Hash-Aktionen ignorieren!
+    if (isResetting) return;
+
     var hash = window.location.hash.slice(1);
     var params = new URLSearchParams(hash);
 
@@ -1361,7 +1366,8 @@ function Canvas() {
       }
     }
 
-    if (!params.has("ids") && scale > 1) {
+    // Nur resetten, wenn KEINE User-Interaktion vorlag und nicht bereits zurückgesetzt wird
+    if (!params.has("ids") && scale > 1 && !userInteraction) {
       canvas.resetZoom();
     }
 
@@ -1372,6 +1378,7 @@ function Canvas() {
         utils.setMode();
         search.reset();
       });
+      userInteraction = false;
       return;
     }
 
@@ -1514,24 +1521,39 @@ function Canvas() {
     quadtree = Quadtree(data);
   };
 
-  // --- SAUBERES HERAUSZOOMEN UND RESETTEN DES ZUSTANDS ---
-  canvas.resetZoom = function (callback) {
+canvas.resetZoom = function (callback) {
+    // Wenn bereits herausgezoomt wird, weiteren Aufruf ignorieren!
+    if (isResetting) return;
+    isResetting = true;
+
     var duration = scale > 1 ? 800 : 100;
 
-    // 1. Medien stoppen
+    // 1. Medien stoppen & Sidebar SOFORT schließen
     canvas.clearMedia();
+    detailContainer.classed("hide", true);
+    d3.select(".tagcloud").classed("hide", false);
 
-    // 2. Hash-Debounce und Source-Event abbrechen, damit zoomend keine neuen IDs erzeugt
+    // 2. Hash-Debouncer stoppen
     if (debounceHash) {
       clearTimeout(debounceHash);
       debounceHash = null;
     }
     lastSourceEvent = null;
 
-    // 3. IDs sauber aus dem URL-Hash entfernen
+    // 3. Status-Variablen zurücksetzen
+    zoomedToImage = false;
+    selectedImage = null;
+    state.zoomingToImage = false;
+    drag = false;
+    userInteraction = true; // Signalsiert onhashchange, dass wir diesen Change selbst ausgelöst haben
+
+    showAllImages();
+    if (typeof clearBigImages === "function") clearBigImages();
+
+    // 4. URL Hash säubern
     if (typeof utils !== "undefined" && utils.updateHash) {
       utils.updateHash("ids", "");
-    } else if (window.location.hash.includes("ids=")) {
+    } else {
       var params = new URLSearchParams(window.location.hash.slice(1));
       params.delete("ids");
       window.location.hash = params.toString();
@@ -1540,29 +1562,21 @@ function Canvas() {
     extent = d3.extent(data, function (d) { return d.y; });
     var y = -bottomPadding;
 
-    // 4. GUI & Texturen aufräumen
-    detailContainer.classed("hide", true);
-    d3.select(".tagcloud").classed("hide", false);
-    showAllImages();
-    if (typeof clearBigImages === "function") clearBigImages();
-
-    // 5. Status-Variablen sofort freigeben
-    zoomedToImage = false;
-    selectedImage = null;
-    state.zoomingToImage = false;
-    drag = false;
-
     vizContainer.style("pointer-events", "auto");
+    sleep = false; // PIXI Render-Loop aufwecken
 
-    // 6. Zurück zur Übersicht animieren
+    // 5. D3-Zoom-Animation sauber ausführen
     vizContainer
       .interrupt()
-      .call(zoom.translate(translate).event)
+      .call(zoom.scale(scale).translate(translate).event)
       .transition()
       .duration(duration)
-      .call(zoom.translate([0, y]).scale(1).event)
+      .call(zoom.scale(1).translate([0, y]).event)
       .each("end", function () {
+        isResetting = false;
+        userInteraction = false;
         lastSourceEvent = null;
+        sleep = false;
         if (callback && scale < zoomBarrier) callback();
       });
   };
