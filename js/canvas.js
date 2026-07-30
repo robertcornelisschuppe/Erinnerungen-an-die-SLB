@@ -749,7 +749,7 @@ canvas.init = function (_data, _timeline, _config) {
         mousemove(d);
         touchstart = new Date() * 1;
       })
-      .on("click", function () {
+.on("click", function () {
 
         if (d3.event.shiftKey) {
           console.log("shift click", selectedImage);
@@ -767,25 +767,40 @@ canvas.init = function (_data, _timeline, _config) {
         if (clicktime < 250) return;
         lastClick = new Date() * 1;
 
-        console.log("click");
         if (spriteClick) {
           spriteClick = false;
           return;
         }
 
-        if (selectedImage && !selectedImage.id) return;
         if (drag) return;
-        if (selectedImageDistance > cursorCutoff) return;
-        if (selectedImage && selectedImage.active === false) return;
         if (timelineHover) return;
+
+        // Status prüfen: Ist die Sidebar geöffnet oder herausgezoomt?
+        var isSidebarOpen = zoomedToImage || !detailContainer.classed("hide") || scale > 1.1;
+
+        // Klick auf allgemeine Freifläche / HINTERGRUND
+        if (selectedImageDistance > cursorCutoff) {
+          if (isSidebarOpen) {
+            userInteraction = true;
+            if (typeof utils !== "undefined" && utils.updateHash) {
+              utils.updateHash("ids", "");
+            }
+            canvas.resetZoom();
+          }
+          return;
+        }
+
+        if (selectedImage && !selectedImage.id) return;
+        if (selectedImage && selectedImage.active === false) return;
         
         userInteraction = true;
 
         if (Math.abs(zoomedToImageScale - scale) < 0.1) {
+          if (typeof utils !== "undefined" && utils.updateHash) {
+            utils.updateHash("ids", "");
+          }
           canvas.resetZoom();
         } else {
-          // FIX: Redirect single clicks directly into our robust setView architecture 
-          // to open the sidebar detail layout and center up perfectly.
           var calcDuration = Math.round(1400 / Math.sqrt(Math.sqrt(scale)));
           canvas.setView([selectedImage.id], calcDuration);
         }
@@ -802,20 +817,20 @@ canvas.init = function (_data, _timeline, _config) {
 
 window.addEventListener("keydown", function(event) {
     if (event.key === "Escape" || event.keyCode === 27) {
-      // Check the URL directly to see if an item sidebar is currently open
-      var isSidebarOpen = window.location.hash.indexOf("ids=") !== -1;
+      // Prüfen, ob die Sidebar offen oder die Ansicht eingezoomt ist
+      var isSidebarOpen = zoomedToImage || !detailContainer.classed("hide") || (window.location.hash.indexOf("ids=") !== -1) || scale > 1.05;
 
       if (isSidebarOpen) {
-        // 1st press (or sidebar open): clear the hash to close the sidebar
         event.preventDefault();
         event.stopPropagation();
+        userInteraction = true;
+        
+        // Hash leeren (URL zurücksetzen)
         if (typeof utils !== "undefined" && utils.updateHash) {
           utils.updateHash("ids", "");
         }
-      } else {
-        // 2nd press (or sidebar was already closed manually): zoom out to start view
-        event.preventDefault();
-        event.stopPropagation();
+        
+        // Sidebar schließen, Medien stoppen und direkt herauszoomen
         canvas.resetZoom();
       }
     }
@@ -1707,6 +1722,8 @@ function zoomToImage(d, duration) {
 
 canvas.resetZoom = function (callback) {
     var duration = scale > 1 ? 1000 : 100;
+    
+    // 1. Laufende Video- und Audio-Medien sofort stoppen
     canvas.clearMedia();
 
     extent = d3.extent(data, function (d) {
@@ -1715,13 +1732,18 @@ canvas.resetZoom = function (callback) {
 
     var y = -bottomPadding;
 
-    // 1. Instant UI cleanup so it never gets stuck open
-    d3.select(".sidebar").classed("sneak", true);
+    // 2. Sidebar ausblenden, Tagcloud zeigen und restliche Bilder wieder einblenden
+    detailContainer.classed("hide", true);
     d3.select(".tagcloud").classed("hide", false);
+    showAllImages();
     if (typeof clearBigImages === "function") clearBigImages();
 
-    // 2. The Tab-Safe Fallback: Guarantees the canvas unlocks 
-    // even if the browser aggressively pauses the inactive tab!
+    // Status-Variablen zurücksetzen
+    zoomedToImage = false;
+    selectedImage = null;
+    state.zoomingToImage = false;
+
+    // 3. Canvas entsperren
     setTimeout(function() {
         vizContainer.style("pointer-events", "auto");
         zoomedToImage = false;
@@ -1730,7 +1752,7 @@ canvas.resetZoom = function (callback) {
         state.zoomingToImage = false;
     }, duration + 50);
 
-    // 3. Smooth movement with .interrupt() to stop dual-call crashes
+    // 4. Sanfte Zoom-Animation zurück zur Startansicht
     vizContainer
       .interrupt() 
       .call(zoom.translate(translate).event)
