@@ -1990,7 +1990,28 @@ if (d._description) {
       }
     }
   }
+canvas.closeDetailAndReset = function() {
+  // 1. Status-Flags zurücksetzen
+  zoomedToImage = false;
+  state.lastZoomed = 0;
 
+  // 2. Alle Thumbnails wieder anzeigen & High-Res Texturen aufräumen
+  showAllImages();
+  clearBigImages();
+
+  // 3. Sidebar / Video-Container ausblenden
+  d3.select(".sidebar").classed("hide", true);
+
+  // 4. URL-Hash leeren (entfernt ?ids=... damit onhashchange nicht blockiert)
+  if (window.location.hash.includes("ids=")) {
+    var params = new URLSearchParams(window.location.hash.slice(1));
+    params.delete("ids");
+    window.location.hash = params.toString();
+  }
+
+  // 5. D3-Zoom zurück auf Startposition animieren
+  canvas.resetZoom();
+};
 
 
   return canvas;
