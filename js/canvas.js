@@ -1545,7 +1545,7 @@ canvas.resetZoom = function (callback) {
     selectedImage = null;
     state.zoomingToImage = false;
     drag = false;
-    userInteraction = true; // Signalsiert onhashchange, dass wir diesen Change selbst ausgelöst haben
+    userInteraction = true;
 
     showAllImages();
     if (typeof clearBigImages === "function") clearBigImages();
@@ -1560,18 +1560,57 @@ canvas.resetZoom = function (callback) {
     }
 
     extent = d3.extent(data, function (d) { return d.y; });
-    var y = -bottomPadding;
+    var targetY = -bottomPadding;
 
     vizContainer.style("pointer-events", "auto");
-    sleep = false; // PIXI Render-Loop aufwecken
 
-    // 5. D3-Zoom-Animation sauber ausführen
+    // 5. Saubere Frame-für-Frame Interpolation anstelle von zoom.event
+    var startScale = scale;
+    var startTranslate = [translate[0], translate[1]];
+    var targetScale = 1;
+    var targetTranslate = [0, targetY];
+
+    var iScale = d3.interpolateNumber(startScale, targetScale);
+    var iTranslate = d3.interpolateArray(startTranslate, targetTranslate);
+
     vizContainer
       .interrupt()
-      .call(zoom.scale(scale).translate(translate).event)
       .transition()
       .duration(duration)
-      .call(zoom.scale(1).translate([0, y]).event)
+      .tween("zoom", function () {
+        return function (t) {
+          var s = iScale(t);
+          var tr = iTranslate(t);
+
+          // Globale Variablen & D3 Zoom synchronisieren
+          scale = s;
+          translate = tr;
+          zoom.scale(s).translate(tr);
+
+          // Pixi Stage synchronisieren
+          stage2.scale.x = s;
+          stage2.scale.y = s;
+          stage2.x = tr[0];
+          stage2.y = tr[1];
+
+          // Timeline synchronisieren (falls vorhanden)
+          if (typeof timeline !== "undefined" && timeline.update) {
+            var x1 = (-1 * tr[0]) / s;
+            var x2 = x1 + widthOuter / s;
+            timeline.update(x1, x2, s, tr, scale1);
+          }
+
+          // UI Elemente wieder einblenden
+          if (s < zoomBarrier && zoomBarrierState) {
+            zoomBarrierState = false;
+            d3.select(".tagcloud, .crossfilter").classed("hide", false);
+            d3.select(".vorbesitzerinOuter").classed("hide", false);
+            d3.select(".searchbar").classed("hide", false);
+          }
+
+          sleep = false; // Render-Loop aufwecken
+        };
+      })
       .each("end", function () {
         isResetting = false;
         userInteraction = false;
