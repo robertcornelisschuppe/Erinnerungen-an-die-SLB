@@ -1973,3 +1973,67 @@ if (d._description) {
 
   return canvas;
 }
+/**
+ * Funktion zum Schließen der Sidebar und Herauszoomen auf die Übersicht
+ */
+function closeSidebarAndResetZoom() {
+  var detailEl = d3.select('.detail');
+  
+  // Checken, ob die Sidebar aktuell geöffnet ist
+  if (detailEl && !detailEl.classed('hide')) {
+    
+    // 1. Sidebar ausblenden / schließen (entspricht VIKUS Viewer Standard)
+    detailEl.classed('hide', true);
+
+    // 2. Videos in der Sidebar stoppen (falls iframe oder html5 video)
+    var iframes = document.querySelectorAll('.detail iframe');
+    iframes.forEach(function(iframe) {
+      var src = iframe.src;
+      iframe.src = src; // Reload stoppt die Video-Wiedergabe
+    });
+
+    var videos = document.querySelectorAll('.detail video');
+    videos.forEach(function(video) {
+      video.pause();
+    });
+
+    // 3. Zoom der Hauptansicht zurücksetzen
+    if (window.canvas) {
+      if (typeof canvas.resetZoom === 'function') {
+        canvas.resetZoom();
+      } else if (typeof canvas.zoomToFit === 'function') {
+        canvas.zoomToFit();
+      } else if (typeof canvas.deselect === 'function') {
+        canvas.deselect();
+      } else if (canvas.zoom) {
+        // Fallback: D3-Zoom-Transformation auf Ursprung zurücksetzen
+        canvas.zoom.translate([0, 0]).scale(1);
+        if (typeof canvas.update === 'function') {
+          canvas.update();
+        }
+      }
+    }
+  }
+}
+
+// ==========================================
+// 1. ESC-Taste EventHandler
+// ==========================================
+window.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape' || event.keyCode === 27) {
+    closeSidebarAndResetZoom();
+  }
+});
+
+// ==========================================
+// 2. Klick auf die linke Freifläche (Canvas)
+// ==========================================
+document.addEventListener('DOMContentLoaded', function() {
+  var canvasElement = document.querySelector('canvas');
+  if (canvasElement) {
+    canvasElement.addEventListener('click', function(event) {
+      // Wenn auf die Freifläche/Canvas geklickt wird, während die Sidebar offen ist
+      closeSidebarAndResetZoom();
+    });
+  }
+});
