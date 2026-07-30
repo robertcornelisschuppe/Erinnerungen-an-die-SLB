@@ -15,9 +15,9 @@ function Canvas() {
   var minHeight = 400;
   var width = window.innerWidth - margin.left - margin.right;
   var widthOuter = window.innerWidth;
-  var height = window.innerHeight // < minHeight ? minHeight : window.innerHeight;
-  console.log("height", height)
-  console.log("width", width)
+  var height = window.innerHeight;
+  console.log("height", height);
+  console.log("width", width);
 
   var scale;
   var scale1 = 1;
@@ -37,7 +37,7 @@ function Canvas() {
     .ordinal()
     .rangeBands([margin.left, width + margin.left], 0.2);
 
-  var yscale = d3.scale.linear()
+  var yscale = d3.scale.linear();
 
   var Quadtree = d3.geom
     .quadtree()
@@ -113,15 +113,15 @@ function Canvas() {
   var stage, stage1, stage2, stage3, stage4, stage5;
   var timelineHover = false;
   var tsneIndex = {};
-  var tsneScale = {}
+  var tsneScale = {};
   var mediaPlayerContainer;
 
-  function canvas() { }
+  function canvas() {}
 
   canvas.margin = margin;
 
-  var annotationVectors = ""
-  var annotationVectorGraphics = undefined
+  var annotationVectors = "";
+  var annotationVectorGraphics = undefined;
 
   canvas.abs2relCoordinate = function (p) {
     return [
@@ -129,43 +129,31 @@ function Canvas() {
       ((-1 * p[1]) / widthOuter) * 100,
     ].map(function (d) {
       return Math.round(d * 100) / 100;
-    })
-  }
+    });
+  };
 
   canvas.rel2absCoordinate = function (p) {
-    return [
-      p[0] / 100 * widthOuter,
-      (-1 * p[1] / 100) * widthOuter,
-    ]
-  }
+    return [(p[0] / 100) * widthOuter, (-1 * p[1] / 100) * widthOuter];
+  };
 
-  canvas.addVector = function (startNew = false) {
+  canvas.addVector = function (startNew) {
+    if (startNew === void 0) { startNew = false; }
     var mouse = d3.mouse(vizContainer.node());
     var p = toScreenPoint(mouse);
     var relative = canvas.abs2relCoordinate(p);
 
-    console.log("add vector", relative, p)
-
     if (startNew || annotationVectors.length == 0) {
-      annotationVectors += (annotationVectors.length ? "," : "") + "w1"
+      annotationVectors += (annotationVectors.length ? "," : "") + "w1";
     }
 
     annotationVectors += "," + relative[0] + "-" + relative[1];
-    console.log("vectors", annotationVectors)
 
-    utils.updateHash("vector", annotationVectors)
+    utils.updateHash("vector", annotationVectors);
     canvas.drawVectors();
-  }
+  };
 
   canvas.parseVectors = function (v) {
-    if (v == undefined) return;
-    if (v == "") return;
-
-    // example: "w1,0-0,1-1,2-2,w2,3-3,4-4"
-    // w1 means new vector with weight 1 
-    // 0-0,1-1,2-2 means vector points
-    // w2 means new vector with weight 2
-    // 3-3,4-4 means vector points
+    if (v == undefined || v == "") return;
 
     var parts = v.split(",");
     var vectors = [];
@@ -174,8 +162,6 @@ function Canvas() {
     for (var i = 0; i < parts.length; i++) {
       var part = parts[i].trim();
       if (part.startsWith("w")) {
-        // new vector with weight
-
         if (currentVector.length > 0) {
           vectors.push({
             vector: currentVector,
@@ -183,18 +169,14 @@ function Canvas() {
           });
         }
         currentWeight = parseFloat(part.replaceAll("w", ""));
-
         currentVector = [];
       } else {
-        // vector point
         var coords = part.split("-").map(function (d) {
           return parseFloat(d);
         });
         if (coords.length == 2) {
           var decodeAnnotationCoordinates = canvas.rel2absCoordinate(coords);
           currentVector.push(decodeAnnotationCoordinates);
-        } else {
-          console.log("invalid vector point", part);
         }
       }
     }
@@ -204,12 +186,10 @@ function Canvas() {
         weight: currentWeight,
       });
     }
-    // console.log("parsed vectors", vectors);
     return vectors;
-  }
+  };
 
   canvas.drawVectors = function () {
-    // console.log("drawVectors", annotationVectors)
     if (annotationVectorGraphics) {
       stage3.removeChild(annotationVectorGraphics);
       annotationVectorGraphics.destroy(true);
@@ -218,20 +198,19 @@ function Canvas() {
 
     if (annotationVectors.length == 0) return;
 
-
     var parsedVectors = canvas.parseVectors(annotationVectors);
-    console.log("parsedVectors", parsedVectors)
-    
+    if (!parsedVectors) return;
+
     annotationVectorGraphics = new PIXI.Graphics();
 
     for (var i = 0; i < parsedVectors.length; i++) {
       var vector = parsedVectors[i].vector;
       var weight = parsedVectors[i].weight;
-      
+
       var lineColorHash = config.style?.annotationLineColor || "#00ff00";
       var color = parseInt(lineColorHash.substring(1), 16);
-      annotationVectorGraphics.lineStyle(weight, color, 1 );
-      // draw lines between points
+      annotationVectorGraphics.lineStyle(weight, color, 1);
+
       for (var j = 0; j < vector.length - 1; j++) {
         var start = vector[j];
         var end = vector[j + 1];
@@ -241,20 +220,19 @@ function Canvas() {
       annotationVectorGraphics.endFill();
       annotationVectorGraphics.position.x = 0;
       annotationVectorGraphics.position.y = 0;
-      annotationVectorGraphics.scale.x = scale1
+      annotationVectorGraphics.scale.x = scale1;
       annotationVectorGraphics.scale.y = scale1;
       annotationVectorGraphics.interactive = false;
       annotationVectorGraphics.buttonMode = false;
       annotationVectorGraphics.visible = true;
       annotationVectorGraphics.zIndex = 1000;
-
     }
 
     stage3.addChild(annotationVectorGraphics);
 
     sleep = false;
     animate();
-  }
+  };
 
   canvas.removeAllVectors = function () {
     if (annotationVectorGraphics) {
@@ -262,110 +240,108 @@ function Canvas() {
       annotationVectorGraphics.destroy(true);
       annotationVectorGraphics = undefined;
     }
-    annotationVectors = ""
+    annotationVectors = "";
     sleep = false;
-  }
+  };
 
   canvas.removeAllCustomGraphics = function () {
     canvas.removeAllVectors();
     canvas.removeAllBorders();
-  }
+  };
 
-canvas.clearMedia = function () {
+  canvas.clearMedia = function () {
     if (mediaPlayerContainer) {
-        // Clearing the HTML stops playback
-        mediaPlayerContainer.html("");
-        mediaPlayerContainer.style("display", "none");
+      mediaPlayerContainer.html("");
+      mediaPlayerContainer.style("display", "none");
     }
-};
+  };
 
-canvas.loadMedia = function (d) {
+  canvas.loadMedia = function (d) {
     var link = d.media_link;
     if (!link) {
-        canvas.clearMedia();
-        return;
+      canvas.clearMedia();
+      return;
     }
 
     var iframeHtml = "";
 
-    // 1. YouTube embedding
     if (link.includes("youtube.com") || link.includes("youtu.be")) {
-        var videoId = "";
-        if (link.includes("youtu.be/")) {
-            videoId = link.split("youtu.be/")[1].split(/[?&]/)[0];
-        } else if (link.includes("v=")) {
-            videoId = link.split("v=")[1].split(/[?&]/)[0];
-        }
-        if (videoId) {
-            iframeHtml = '<iframe class="media-iframe" src="https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0&showinfo=0&controls=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
-        }
-    } 
-    // 2. SoundCloud embedding
-    else if (link.includes("soundcloud.com/player/")) {
-        iframeHtml = '<iframe class="media-iframe" scrolling="no" frameborder="no" allow="autoplay" src="' + link + '&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true"></iframe>';
-    } 
-    // 3. Generic HTML5 Video (e.g., local .mp4, .webm)
-    else if (link.match(/\.(mp4|ogg|webm)$/i)) {
-        // FIX: Removed fixed dimensions, added class="media-iframe" to fill the box
-        iframeHtml = '<video class="media-iframe" controls autoplay><source src="' + link + '" type="video/mp4">Your browser does not support the video tag.</video>';
-    }
-    // 4. Generic HTML5 Audio (e.g., local .mp3, .wav)
-    else if (link.match(/\.(mp3|wav|ogg)$/i)) {
-        iframeHtml = '<audio id="vikus-audio-player" controls autoplay style="width:100%;">' +
-        '<source src="' + link + '" type="audio/mpeg">' +
-        '<source src="' + link + '">' + 
-        'Your browser does not support the audio element.</audio>';
+      var videoId = "";
+      if (link.includes("youtu.be/")) {
+        videoId = link.split("youtu.be/")[1].split(/[?&]/)[0];
+      } else if (link.includes("v=")) {
+        videoId = link.split("v=")[1].split(/[?&]/)[0];
+      }
+      if (videoId) {
+        iframeHtml =
+          '<iframe class="media-iframe" src="https://www.youtube.com/embed/' +
+          videoId +
+          '?autoplay=1&rel=0&showinfo=0&controls=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+      }
+    } else if (link.includes("soundcloud.com/player/")) {
+      iframeHtml =
+        '<iframe class="media-iframe" scrolling="no" frameborder="no" allow="autoplay" src="' +
+        link +
+        '&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true"></iframe>';
+    } else if (link.match(/\.(mp4|ogg|webm)$/i)) {
+      iframeHtml =
+        '<video class="media-iframe" controls autoplay><source src="' +
+        link +
+        '" type="video/mp4">Your browser does not support the video tag.</video>';
+    } else if (link.match(/\.(mp3|wav|ogg)$/i)) {
+      iframeHtml =
+        '<audio id="vikus-audio-player" controls autoplay style="width:100%;">' +
+        '<source src="' +
+        link +
+        '" type="audio/mpeg">' +
+        '<source src="' +
+        link +
+        '">' +
+        "Your browser does not support the audio element.</audio>";
     }
 
     if (iframeHtml) {
-        mediaPlayerContainer.html(iframeHtml);
-        mediaPlayerContainer.style("display", "block");
+      mediaPlayerContainer.html(iframeHtml);
+      mediaPlayerContainer.style("display", "block");
 
-        // --- Dynamic Aspect Ratio Logic ---
-        var ratio = d.aspect_ratio || "16:9"; 
-        var padding = "56.25%"; 
+      var ratio = d.aspect_ratio || "16:9";
+      var padding = "56.25%";
 
-        if (ratio === "4:3") {
-            padding = "75%"; 
-        } else if (ratio === "1:1") {
-            padding = "100%"; 
-        }
+      if (ratio === "4:3") {
+        padding = "75%";
+      } else if (ratio === "1:1") {
+        padding = "100%";
+      }
 
-        mediaPlayerContainer.style("padding-bottom", padding);
-        // ----------------------------------
+      mediaPlayerContainer.style("padding-bottom", padding);
 
-        var player = document.getElementById('vikus-audio-player');
-        if (player) {
-            setTimeout(function() {
-                player.play().catch(function(error) {
-                   console.log("Audio autoplay blocked", error);
-                });
-            }, 100); 
-        }
+      var player = document.getElementById("vikus-audio-player");
+      if (player) {
+        setTimeout(function () {
+          player.play().catch(function (error) {
+            console.log("Audio autoplay blocked", error);
+          });
+        }, 100);
+      }
     } else {
-        canvas.clearMedia();
+      canvas.clearMedia();
     }
-};
+  };
 
   canvas.getView = function () {
     var visibleItems = [];
 
     var invScale = 1 / scale;
-    var viewLeft = (-translate[0] * invScale);
-    var viewTop = (-translate[1] * invScale) - height;
+    var viewLeft = -translate[0] * invScale;
+    var viewTop = -translate[1] * invScale - height;
     var viewRight = viewLeft + widthOuter * invScale;
     var viewBottom = viewTop + height * invScale;
 
     data.forEach(function (d) {
       var px = d.x1 / scale1;
       var py = d.y1 / scale1;
-      // var px = d.sprite.position.x / scale1;
-      // var py = d.sprite.position.y / scale1;
-      var halfW = d.sprite.width / scale1 / 2;
-      var halfH = d.sprite.height / scale1 / 2;
-
-      halfH = 0;
-      halfW = 0;
+      var halfW = 0;
+      var halfH = 0;
 
       var left = px - halfW;
       var right = px + halfW;
@@ -383,10 +359,8 @@ canvas.loadMedia = function (d) {
     });
 
     if (visibleItems.length === 0 || visibleItems.length == data.length) {
-      return []
+      return [];
     }
-
-    // console.log("fully visible items:", visibleItems.length, visibleItems.map(function (d) { return d.id; }));
 
     var mostLeft = null;
     var mostRight = null;
@@ -407,48 +381,52 @@ canvas.loadMedia = function (d) {
       mostBottom?.id,
     ]);
 
-    return Array.from(unique).filter(function (id) { return id !== undefined && id !== null; });
+    return Array.from(unique).filter(function (id) {
+      return id !== undefined && id !== null;
+    });
   };
 
-
-canvas.setView = function (ids, duration) {
-    if (duration === void 0) { duration = 1000; }
-    var items = data.filter(function (d) { return ids.includes(d.id); });
+  canvas.setView = function (ids, duration) {
+    if (duration === void 0) {
+      duration = 1000;
+    }
+    var items = data.filter(function (d) {
+      return ids.includes(d.id);
+    });
     if (!items.length) return;
 
-    // If it's a single item view, let our robust click handler logic do the math
-    // so it perfectly matches the user interaction state and doesn't get stuck!
     if (items.length == 1) {
-        var d = items[0];
-        selectedImage = d;
-        
-        if (typeof zoomToImage === "function") {
-            zoomToImage(d, duration);
-            
-            // Trigger the sidebar video and details simultaneously
-            showDetail(d);
-            canvas.loadMedia(d);
-            loadBigImage(d, "click");
-            hideTheRest(d);
-            return;
-        }
+      var d = items[0];
+      selectedImage = d;
+
+      if (typeof zoomToImage === "function") {
+        zoomToImage(d, duration);
+        showDetail(d);
+        canvas.loadMedia(d);
+        loadBigImage(d, "click");
+        hideTheRest(d);
+        return;
+      }
     }
 
-    // --- Fallback Bounding Box Zoom (For Multi-Item selections) ---
     vizContainer.style("pointer-events", "none");
     zoom.center(null);
     state.zoomingToImage = true;
 
-    var xs = items.map(function (d) { return d.x; });
-    var ys = items.map(function (d) { return d.y; });
+    var xs = items.map(function (d) {
+      return d.x;
+    });
+    var ys = items.map(function (d) {
+      return d.y;
+    });
 
     var minX = d3.min(xs);
     var maxX = d3.max(xs);
     var minY = d3.min(ys);
     var maxY = d3.max(ys);
 
-    var width = canvas.width();
-    var height = canvas.height();
+    var w = canvas.width();
+    var h = canvas.height();
 
     var padding = rangeBandImage / 2;
     var boxWidth = maxX - minX + padding * 2;
@@ -457,53 +435,42 @@ canvas.setView = function (ids, duration) {
     var centerX = (minX + maxX) / 2;
     var centerY = (minY + maxY) / 2;
 
-    var scale = 0.9 / Math.max(boxWidth / width, boxHeight / height);
+    var sc = 0.9 / Math.max(boxWidth / w, boxHeight / h);
 
     var currentSidebarWidth = Math.min(700, widthOuter * 0.4);
     var translateTarget = [
-        (width - currentSidebarWidth) / 2 - scale * centerX,
-        height / 2 - scale * centerY
+      (w - currentSidebarWidth) / 2 - sc * centerX,
+      h / 2 - sc * centerY,
     ];
 
     vizContainer
-        .interrupt()
-        .call(zoom.translate(translate).event)
-        .transition()
-        .duration(duration)
-        .call(zoom.scale(scale).translate(translateTarget).event)
-        .each("end", function () {
-            state.zoomingToImage = false;
-            vizContainer.style("pointer-events", "auto");
-            
-            var settledFrames = 5;
-            function settleLayout() {
-                sleep = false;
-                if (typeof animate === "function") animate();
-                if (settledFrames-- > 0) {
-                    requestAnimationFrame(settleLayout);
-                }
-            }
-            settleLayout();
-        });
-};
+      .interrupt()
+      .call(zoom.translate(translate).event)
+      .transition()
+      .duration(duration)
+      .call(zoom.scale(sc).translate(translateTarget).event)
+      .each("end", function () {
+        state.zoomingToImage = false;
+        vizContainer.style("pointer-events", "auto");
 
-  
-  canvas.rangeBand = function () {
-    return rangeBand;
+        var settledFrames = 5;
+        function settleLayout() {
+          sleep = false;
+          if (typeof animate === "function") animate();
+          if (settledFrames-- > 0) {
+            requestAnimationFrame(settleLayout);
+          }
+        }
+        settleLayout();
+      });
   };
-  canvas.width = function () {
-    return width;
-  };
-  canvas.height = function () {
-    return height;
-  };
-  canvas.rangeBandImage = function () {
-    return rangeBandImage;
-  };
+
+  canvas.rangeBand = function () { return rangeBand; };
+  canvas.width = function () { return width; };
+  canvas.height = function () { return height; };
+  canvas.rangeBandImage = function () { return rangeBandImage; };
   canvas.zoom = zoom;
-  canvas.selectedImage = function () {
-    return selectedImage;
-  };
+  canvas.selectedImage = function () { return selectedImage; };
   canvas.x = x;
   canvas.y = yscale;
 
@@ -537,12 +504,10 @@ canvas.setView = function (ids, duration) {
     zoomedToImageScale =
       (0.8 / (rangeBand / columns / width)) *
       (state.mode.type === "group" ? 1 : 0.5);
-    // console.log("zoomedToImageScale", zoomedToImageScale)
   };
 
   canvas.initGroupLayout = function () {
-    var groupKey = state.mode.groupKey
-    console.log("initGroupLayout", groupKey);
+    var groupKey = state.mode.groupKey;
     canvasDomain = d3
       .nest()
       .key(function (d) {
@@ -556,54 +521,25 @@ canvas.setView = function (ids, duration) {
         return d.key;
       });
 
-    // if (groupKey == "stadt") {
-    //   console.log("stadt", canvasDomain)
-    //   const missing = canvasDomain.filter(d => !utils.citiesOrder.includes(d))
-    //   console.log("missing", missing)
-    //   canvasDomain = utils.citiesOrder
-    // }
-
     timeDomain = canvasDomain.map(function (d) {
       return {
         key: d,
         values: timelineData
           .filter(function (e) {
             return d == e[groupKey];
-          }).map(function (e) {
+          })
+          .map(function (e) {
             e.type = "timeline";
             return e;
-          })
+          }),
       };
     });
-    // console.log("canvasDomain", canvasDomain);
-    // console.log("timeDomain", timeDomain);
-
 
     timeline.init(timeDomain);
-
     x.domain(canvasDomain);
-
   };
 
-  // canvas.setCustomTimelineData = function () {
-  //   timelineData = [{ "x": "54", "key": "200" }, { "x": "182", "key": "1k" }, { "x": "237", "key": "2k" }, { "x": "365", "key": "10k" }, { "x": "420", "key": "20k" }, { "x": "548", "key": "100k" }, { "x": "603", "key": "200k" }, { "x": "731", "key": "1M" }, { "x": "786", "key": "2M" }]
-  //   canvasDomain = timelineData.map(d => d.key)
-  //   timeDomain = timelineData.map(function (d) {
-  //     return {
-  //       key: d.key,
-  //       values: [],
-  //       type: "static",
-
-  //     };
-  //   });
-  //   timeline.init(timeDomain);
-  //   x.domain(canvasDomain);
-
-  //   console.log("canvasDomain", canvasDomain);
-  //   console.log("timeDomain", timeDomain);
-  // }
-
-canvas.init = function (_data, _timeline, _config) {
+  canvas.init = function (_data, _timeline, _config) {
     data = _data;
     config = _config;
     timelineData = _timeline;
@@ -612,9 +548,10 @@ canvas.init = function (_data, _timeline, _config) {
     detailVue._data.structure = config.detail.structure;
 
     var detailInner = d3.select(".detail .inner");
-    mediaPlayerContainer = detailInner.append("div")
-        .classed("media-player-container", true);   
-    
+    mediaPlayerContainer = detailInner
+      .append("div")
+      .classed("media-player-container", true);
+
     columns = config.projection.columns;
     imageSize = config.loader.textures.medium.size;
     imageSize2 = config.loader.textures.detail.size;
@@ -624,84 +561,84 @@ canvas.init = function (_data, _timeline, _config) {
     }
 
     canvas.resize = function () {
-        if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
-            return;
+      if (
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
+      ) {
+        return;
+      }
+
+      if (!state.init) return;
+
+      var oldWidth = width;
+      var oldHeight = height;
+      var oldTranslateY = translate[1];
+
+      widthOuter = window.innerWidth;
+      width = widthOuter - margin.left - margin.right;
+      height = window.innerHeight;
+
+      resolution = window.devicePixelRatio || 1;
+
+      if (renderer) {
+        renderer.resolution = resolution;
+        renderer.resize(widthOuter, height);
+        renderer.view.style.width = widthOuter + "px";
+        renderer.view.style.height = height + "px";
+      }
+      if (zoom) zoom.size([width, height]);
+
+      var widthRatio = oldWidth > 0 ? width / oldWidth : 1;
+
+      canvas.makeScales();
+      canvas.project();
+
+      data.forEach(function (d) {
+        if (d.sprite) {
+          d.sprite.position.x = d.x1;
+          d.sprite.position.y = d.y1;
         }
-
-        if (!state.init) return;
-
-        // 1. Save old dimensions AND the old camera Y position before we change anything
-        var oldWidth = width;
-        var oldHeight = height;
-        var oldTranslateY = translate[1];
-
-        widthOuter = window.innerWidth;
-        width = widthOuter - margin.left - margin.right;
-        height = window.innerHeight;
-        
-        resolution = window.devicePixelRatio || 1;
-
-        if (renderer) {
-          // FIX 1: Update the internal renderer resolution to match the new browser zoom
-          renderer.resolution = resolution;
-          renderer.resize(widthOuter, height);
-          
-          // FIX 2: Explicitly update the canvas's CSS style dimensions to prevent stretching/squashing
-          renderer.view.style.width = widthOuter + "px";
-          renderer.view.style.height = height + "px";
+        if (d.sprite2) {
+          d.sprite2.position.x = d.x * scale2 + imageSize2 / 2;
+          d.sprite2.position.y = d.y * scale2 + imageSize2 / 2;
         }
-        if (zoom) zoom.size([width, height]);
+      });
 
-        var widthRatio = oldWidth > 0 ? width / oldWidth : 1;
+      if (canvas.updateBorderPositions) canvas.updateBorderPositions();
 
-        canvas.makeScales();
-        canvas.project();
-
-        data.forEach(function(d) {
-          if (d.sprite) {
-            d.sprite.position.x = d.x1;
-            d.sprite.position.y = d.y1;
-          }
-          if (d.sprite2) {
-            d.sprite2.position.x = d.x * scale2 + imageSize2 / 2;
-            d.sprite2.position.y = d.y * scale2 + imageSize2 / 2;
-          }
-        });
-        
-        if (canvas.updateBorderPositions) canvas.updateBorderPositions();
-
-        if (zoomedToImage && selectedImage) {
-          if (typeof clearBigImages === "function") clearBigImages();
-          
-          // Reference the public component framework safely
-          if (canvas.setView) {
-            canvas.setView([selectedImage.id], 0); 
-          }
-        } else {
-          // 2. PERFECT CAMERA MATH: 
-          translate[0] = translate[0] * widthRatio;
-          translate[1] = (height / 2) - ((oldHeight / 2 - oldTranslateY - oldHeight * scale) * widthRatio) - (height * scale);
-          
-          zoom.translate(translate);
-          stage2.x = translate[0];
-          stage2.y = translate[1];
+      if (zoomedToImage && selectedImage) {
+        if (typeof clearBigImages === "function") clearBigImages();
+        if (canvas.setView) {
+          canvas.setView([selectedImage.id], 0);
         }
+      } else {
+        translate[0] = translate[0] * widthRatio;
+        translate[1] =
+          height / 2 -
+          (oldHeight / 2 - oldTranslateY - oldHeight * scale) * widthRatio -
+          height * scale;
 
-        sleep = false;
-        if (typeof animate === "function") animate();
+        zoom.translate(translate);
+        stage2.x = translate[0];
+        stage2.y = translate[1];
+      }
+
+      sleep = false;
+      if (typeof animate === "function") animate();
     };
-        
+
     window.addEventListener("resize", canvas.resize);
-        
+
     var renderOptions = {
       resolution: resolution,
       antialiasing: true,
-      transparent: true,  // <--- Allows CSS background to show through!
+      transparent: true,
       width: width + margin.left + margin.right,
       height: height,
     };
     renderer = new PIXI.Renderer(renderOptions);
-    
     window.renderer = renderer;
 
     var renderElem = d3.select(container.node().appendChild(renderer.view));
@@ -721,24 +658,20 @@ canvas.init = function (_data, _timeline, _config) {
 
     canvas.initGroupLayout();
 
-    // add preview pics
-    data.forEach(function (d, i) {
+    data.forEach(function (d) {
       var sprite = new PIXI.Sprite(PIXI.Texture.WHITE);
-
       sprite.anchor.x = 0.5;
       sprite.anchor.y = 0.5;
-
       sprite.scale.x = d.scaleFactor;
       sprite.scale.y = d.scaleFactor;
-
       sprite._data = d;
       d.sprite = sprite;
-
       stage3.addChild(sprite);
     });
 
     var lastClick = 0;
 
+    // --- KLICK-HANDLER FÜR DIE ZEICHENFLÄCHE ---
     vizContainer = d3
       .select(".viz")
       .call(zoom)
@@ -749,15 +682,12 @@ canvas.init = function (_data, _timeline, _config) {
         mousemove(d);
         touchstart = new Date() * 1;
       })
-.on("click", function () {
-
+      .on("click", function () {
         if (d3.event.shiftKey) {
-          console.log("shift click", selectedImage);
           canvas.addBorderToImage(selectedImage);
           return;
         }
         if (d3.event.ctrlKey || d3.event.metaKey) {
-          console.log("ctrl/cmd click");
           var startNew = d3.event.altKey;
           canvas.addVector(startNew);
           return;
@@ -772,71 +702,67 @@ canvas.init = function (_data, _timeline, _config) {
           return;
         }
 
-        if (drag) return;
-        if (timelineHover) return;
+        if (drag || timelineHover) return;
 
-        // Status prüfen: Ist die Sidebar geöffnet oder herausgezoomt?
-        var isSidebarOpen = zoomedToImage || !detailContainer.classed("hide") || scale > 1.1;
+        var isZoomedOrOpen =
+          zoomedToImage || !detailContainer.classed("hide") || scale > 1.2;
 
-        // Klick auf allgemeine Freifläche / HINTERGRUND
+        // Fall 1: Klick ins Leere
         if (selectedImageDistance > cursorCutoff) {
-          if (isSidebarOpen) {
+          if (isZoomedOrOpen) {
             userInteraction = true;
-            if (typeof utils !== "undefined" && utils.updateHash) {
-              utils.updateHash("ids", "");
-            }
             canvas.resetZoom();
           }
           return;
         }
 
-        if (selectedImage && !selectedImage.id) return;
-        if (selectedImage && selectedImage.active === false) return;
-        
+        // Fall 2: Klick auf ein Element
+        if (!selectedImage || !selectedImage.id || selectedImage.active === false) {
+          return;
+        }
+
         userInteraction = true;
 
-        if (Math.abs(zoomedToImageScale - scale) < 0.1) {
-          if (typeof utils !== "undefined" && utils.updateHash) {
-            utils.updateHash("ids", "");
-          }
+        if (zoomedToImage && selectedImage) {
+          // Bereits gezoomt -> Zurücksetzen
           canvas.resetZoom();
         } else {
+          // Auf Element zoomen
           var calcDuration = Math.round(1400 / Math.sqrt(Math.sqrt(scale)));
           canvas.setView([selectedImage.id], calcDuration);
         }
       });
 
-    // disable right click when in edit mode
     vizContainer.on("contextmenu", function () {
       if (window.top == window.self) d3.event.preventDefault();
     });
 
     animate();
-
     state.init = true;
 
-window.addEventListener("keydown", function(event) {
-    if (event.key === "Escape" || event.keyCode === 27) {
-      // Prüfen, ob die Sidebar offen oder die Ansicht eingezoomt ist
-      var isSidebarOpen = zoomedToImage || !detailContainer.classed("hide") || (window.location.hash.indexOf("ids=") !== -1) || scale > 1.05;
+    // --- ESCAPE KEY LISTENER ---
+    window.addEventListener(
+      "keydown",
+      function (event) {
+        if (event.key === "Escape" || event.keyCode === 27) {
+          var isSidebarOpen =
+            zoomedToImage ||
+            !detailContainer.classed("hide") ||
+            window.location.hash.indexOf("ids=") !== -1 ||
+            scale > 1.05;
 
-      if (isSidebarOpen) {
-        event.preventDefault();
-        event.stopPropagation();
-        userInteraction = true;
-        
-        // Hash leeren (URL zurücksetzen)
-        if (typeof utils !== "undefined" && utils.updateHash) {
-          utils.updateHash("ids", "");
+          if (isSidebarOpen) {
+            event.preventDefault();
+            event.stopPropagation();
+            userInteraction = true;
+            canvas.resetZoom();
+          }
         }
-        
-        // Sidebar schließen, Medien stoppen und direkt herauszoomen
-        canvas.resetZoom();
-      }
-    }
-  }, true);
-};
-  
+      },
+      true
+    );
+  };
+
   var imageBorders = {};
 
   canvas.updateBorderPositions = function () {
@@ -846,10 +772,8 @@ window.addEventListener("keydown", function(event) {
       var d = graphic.source;
       graphic.position.x = d.sprite.position.x - d.sprite.width / 2;
       graphic.position.y = d.sprite.position.y - d.sprite.height / 2;
-      // console.log(d.sprite.position.x, graphic.position);
     });
-  }
-
+  };
 
   canvas.removeBorder = function (id) {
     if (imageBorders.hasOwnProperty(id)) {
@@ -857,7 +781,7 @@ window.addEventListener("keydown", function(event) {
       delete imageBorders[id];
       sleep = false;
     }
-  }
+  };
 
   canvas.removeAllBorders = function () {
     d3.values(imageBorders).forEach(function (d) {
@@ -865,7 +789,7 @@ window.addEventListener("keydown", function(event) {
     });
     imageBorders = {};
     sleep = false;
-  }
+  };
 
   canvas.addBorder = function (d) {
     sleep = false;
@@ -874,19 +798,13 @@ window.addEventListener("keydown", function(event) {
     var borderColorHash = config.style?.annotationBorderColor || "#ff0000";
     var borderColor = parseInt(borderColorHash.substring(1), 16);
     graphics.lineStyle(5, borderColor, 1);
-    graphics.drawRect(
-      0, 0,
-      sprite.width,
-      sprite.height
-    );
+    graphics.drawRect(0, 0, sprite.width, sprite.height);
     graphics.position.x = sprite.position.x - sprite.width / 2;
     graphics.position.y = sprite.position.y - sprite.height / 2;
-    graphics.source = d
+    graphics.source = d;
     stage3.addChild(graphics);
     imageBorders[d.id] = graphics;
-    console.log("added border", graphics);
-  }
-
+  };
 
   canvas.addBorderToImage = function (d) {
     sleep = false;
@@ -898,22 +816,27 @@ window.addEventListener("keydown", function(event) {
     }
     canvas.addBorder(d);
     updateHashBorders();
-  }
+  };
 
   function updateImageBorders(borderIds) {
-    var enter = borderIds.filter(function (d) { return !imageBorders.hasOwnProperty(d); });
-    var exit = Object.keys(imageBorders).filter(function (d) { return !borderIds.includes(d); });
+    var enter = borderIds.filter(function (d) {
+      return !imageBorders.hasOwnProperty(d);
+    });
+    var exit = Object.keys(imageBorders).filter(function (d) {
+      return !borderIds.includes(d);
+    });
 
     enter.forEach(function (id) {
-      var d = data.find(function (d) { return d.id == id; });
-      canvas.addBorderToImage(d);
+      var d = data.find(function (d) {
+        return d.id == id;
+      });
+      if (d) canvas.addBorderToImage(d);
     });
 
     exit.forEach(function (id) {
       canvas.removeBorder(id);
     });
   }
-
 
   function updateHashBorders() {
     if (!d3.event) return;
@@ -931,12 +854,8 @@ window.addEventListener("keydown", function(event) {
         y: parseFloat(d.y),
       };
     });
-    var xExtent = d3.extent(clean, function (d) {
-      return d.x;
-    });
-    var yExtent = d3.extent(clean, function (d) {
-      return d.y;
-    });
+    var xExtent = d3.extent(clean, function (d) { return d.x; });
+    var yExtent = d3.extent(clean, function (d) { return d.y; });
 
     var x = d3.scale.linear().range([0, 1]).domain(xExtent);
     var y = d3.scale.linear().range([0, 1]).domain(yExtent);
@@ -946,7 +865,7 @@ window.addEventListener("keydown", function(event) {
     });
   };
 
-function mousemove(d) {
+  function mousemove(d) {
     if (timelineHover) return;
 
     var mouse = d3.mouse(vizContainer.node());
@@ -957,14 +876,11 @@ function mousemove(d) {
     var best = utils.nearest(
       p[0] - imgPadding,
       p[1] - imgPadding,
-      {
-        d: distance,
-        p: null,
-      },
+      { d: distance, p: null },
       quadtree
     );
 
-    selectedImageDistance = best && best.d || 1000;
+    selectedImageDistance = (best && best.d) || 1000;
 
     if (best && best.p && !zoomedToImage) {
       var d = best.p;
@@ -977,23 +893,22 @@ function mousemove(d) {
     }
 
     container.style("cursor", function () {
-      // Simply check if we are close enough. Ignore "active" status.
       return selectedImageDistance < cursorCutoff ? "pointer" : "default";
     });
 
     if (d3.event.shiftKey) {
-      container.style("cursor", "copy")
+      container.style("cursor", "copy");
     }
     if (d3.event.ctrlKey || d3.event.metaKey) {
-      container.style("cursor", "crosshair")
-      if(d3.event.altKey) {
-        container.style("cursor", "cell")
+      container.style("cursor", "crosshair");
+      if (d3.event.altKey) {
+        container.style("cursor", "cell");
       }
     }
   }
-  
+
   function stackLayout(data, invert) {
-    var groupKey = state.mode.groupKey
+    var groupKey = state.mode.groupKey;
     var years = d3
       .nest()
       .key(function (d) {
@@ -1031,12 +946,11 @@ function mousemove(d) {
         d.order = (invert ? 1 : 1) * (total - i);
       });
     });
-
   }
 
   function stackYLayout(data, invert) {
-    if (data.length == 0) return
-    var groupKey = state.mode.groupKey
+    if (data.length == 0) return;
+    var groupKey = state.mode.groupKey;
     var years = d3
       .nest()
       .key(function (d) {
@@ -1044,17 +958,14 @@ function mousemove(d) {
       })
       .entries(data);
 
-    // y scale for state.mode.y (e.g. "kaufpreis")
-    var yExtent = d3.extent(data, function (d) { return +d[state.mode.y]; })
-    var yRange = [2 * (rangeBand / columns), height * 0.7]
+    var yExtent = d3.extent(data, function (d) {
+      return +d[state.mode.y];
+    });
+    var yRange = [2 * (rangeBand / columns), height * 0.7];
 
     yExtent[0] = 0;
 
-    var yscale = d3.scale.linear()
-      .domain(yExtent)
-      .range(yRange);
-
-    // console.log("yscale", yscale.domain(), yscale.range())
+    var yscale = d3.scale.linear().domain(yExtent).range(yRange);
 
     years.forEach(function (year) {
       var startX = x(year.key);
@@ -1068,7 +979,6 @@ function mousemove(d) {
 
         d.x = startX + (i % columns) * (rangeBand / columns);
         d.y = (invert ? 1 : -1) * yscale(d[state.mode.y]);
-        //d.y = (invert ? 1 : -1) * (row * (rangeBand / columns));
 
         d.x1 = d.x * scale1 + imageSize / 2;
         d.y1 = d.y * scale1 + imageSize / 2;
@@ -1082,19 +992,8 @@ function mousemove(d) {
           d.sprite2.position.x = d.x * scale2 + imageSize2 / 2;
           d.sprite2.position.y = d.y * scale2 + imageSize2 / 2;
         }
-
-        //d.order = (invert ? 1 : 1) * (total - i);
       });
     });
-
-    // data.filter(d => !d[state.mode.y]).forEach(function (d, i) {
-    //   d.x = 0;
-    //   d.y = 0;
-    //   d.active = false;
-    //   // d.sprite.visible = false;
-    //   // if (d.sprite2) d.sprite2.visible = false;
-    // })
-
   }
 
   canvas.distance = function (a, b) {
@@ -1103,13 +1002,11 @@ function mousemove(d) {
     );
   };
 
-
   var speed = 0.04;
 
   function imageAnimation() {
     var sleep = true;
     var diff, d;
-
 
     for (var i = 0; i < data.length; i++) {
       d = data[i];
@@ -1141,9 +1038,8 @@ function mousemove(d) {
         }
 
         d.sprite2.visible = d.sprite2.alpha > 0.1;
-        //else d.sprite2.visible = d.visible;
       }
-    };
+    }
     canvas.updateBorderPositions();
     return sleep;
   }
@@ -1163,9 +1059,6 @@ function mousemove(d) {
         columns = config.projection.columns;
       }
     }
-    // if (layout.timeline) {
-    //   canvas.setCustomTimelineData()
-    // }
 
     timeline.setDisabled(layout.type != "group" && !layout.timeline);
     canvas.makeScales();
@@ -1200,40 +1093,40 @@ function mousemove(d) {
 
   window.zoomToYear = zoomToYear;
 
-function zoomToImage(d, duration) {
+  function zoomToImage(d, duration) {
     state.zoomingToImage = true;
     vizContainer.style("pointer-events", "none");
     zoom.center(null);
-    
+
     loadMiddleImage(d);
     loadBigImage(d, "click");
-    
+
     d3.select(".tagcloud").classed("hide", true);
 
     var padding = rangeBandImage / 2;
     var max = Math.max(width, height);
     var scale = 1 / (rangeBandImage / (max * 0.85));
-    
+
     var imageAspectRatio = 1;
     if (d.sprite && d.sprite.texture && d.sprite.texture.width > 0) {
-        imageAspectRatio = d.sprite.texture.height / d.sprite.texture.width;
+      imageAspectRatio = d.sprite.texture.height / d.sprite.texture.width;
     } else if (d.sprite && d.sprite.width > 0) {
-        imageAspectRatio = d.sprite.height / d.sprite.width;
+      imageAspectRatio = d.sprite.height / d.sprite.width;
     }
-    var screenImageHeight = (rangeBandImage * scale) * imageAspectRatio;
-    var maxScreenHeight = height * 0.9; 
+    var screenImageHeight = rangeBandImage * scale * imageAspectRatio;
+    var maxScreenHeight = height * 0.9;
     if (screenImageHeight > maxScreenHeight) {
-        scale = scale * (maxScreenHeight / screenImageHeight);
+      scale = scale * (maxScreenHeight / screenImageHeight);
     }
-    
+
     var currentSidebarWidth = Math.min(700, widthOuter * 0.4);
     var visibleCenter = (width - currentSidebarWidth) / 2;
 
     var translateNow = [
-        visibleCenter - scale * (d.x + padding),
-        height / 2 - scale * (height + d.y + padding)
+      visibleCenter - scale * (d.x + padding),
+      height / 2 - scale * (height + d.y + padding),
     ];
-  
+
     zoomedToImageScale = scale;
 
     setTimeout(function () {
@@ -1250,9 +1143,7 @@ function zoomToImage(d, duration) {
         selectedImage = d;
         hideTheRest(d);
         showDetail(d);
-        // REMOVED loadBigImage FROM HERE
         state.zoomingToImage = false;
-        console.log("zoomedToImage", zoomedToImage);
         vizContainer.style("pointer-events", "auto");
         utils.updateHash("ids", d.id, ["translate", "scale"]);
       });
@@ -1260,24 +1151,12 @@ function zoomToImage(d, duration) {
   canvas.zoomToImage = zoomToImage;
 
   function showDetail(d) {
-    // console.log("show detail", d)
-    // console.log(detailVue, detailVue._data.item)
-
     detailContainer.select(".outer").node().scrollTop = 0;
-
-    detailContainer.classed("hide", false).classed("sneak", utils.isMobile() || isInIframe);
-
-    // needs to be done better
-    // for (field in selectedImage) {
-    //   if (field[0] === "_") detailData[field] = selectedImage[field];
-    // }
+    detailContainer
+      .classed("hide", false)
+      .classed("sneak", utils.isMobile() || isInIframe);
 
     var detailData = {};
-    // var activeFields = config.detail.structure
-    //   .filter(function (field, index) {
-    //     return selectedImage[field.source] && selectedImage[field.source] !== "";
-    //   })
-    // console.log("activeFields", activeFields)
 
     config.detail.structure.forEach(function (field) {
       var val = selectedImage[field.source];
@@ -1286,15 +1165,10 @@ function zoomToImage(d, duration) {
       if (field.fields && field.fields.length) {
         field.fields.forEach(function (subfield) {
           var val = selectedImage[subfield];
-          // console.log("subfield", subfield, val)
           if (val && val !== "") detailData[subfield] = val;
-        })
+        });
       }
-      // detailData[field.source] = selectedImage[field.source];
-    })
-    // console.log("showDetail", detailData)
-
-    // detailVue._data.structure = activeFields;
+    });
 
     detailData["_id"] = selectedImage.id;
     detailData["_keywords"] = selectedImage.keywords || "None";
@@ -1304,16 +1178,15 @@ function zoomToImage(d, duration) {
     detailVue.page = d.page;
     detailVue.item = detailData;
 
-    canvas.clearMedia(); // Clear any existing player first
+    canvas.clearMedia();
     if (d.media_link) {
-        canvas.loadMedia(d);
+      canvas.loadMedia(d);
     }
-}
+  }
 
   canvas.showDetail = showDetail;
 
   canvas.changePage = function (id, page) {
-    console.log("changePage", id, page, selectedImage);
     selectedImage.page = page;
     detailVue._data.page = page;
     clearBigImages();
@@ -1346,7 +1219,7 @@ function zoomToImage(d, duration) {
     scale = d3.event.scale;
     if (!startTranslate) startTranslate = translate;
     drag = startTranslate && translate !== startTranslate;
-    // check borders
+
     var x1 = (-1 * translate[0]) / scale;
     var x2 = x1 + widthOuter / scale;
 
@@ -1355,7 +1228,7 @@ function zoomToImage(d, duration) {
 
       if (x1 < 0) {
         translate[0] = 0;
-      } else if (x2 > widthOuter + (sidebarOffset / scale)) {
+      } else if (x2 > widthOuter + sidebarOffset / scale) {
         translate[0] = (widthOuter * scale - widthOuter + sidebarOffset) * -1;
       }
 
@@ -1380,7 +1253,6 @@ function zoomToImage(d, duration) {
     }
 
     if (zoomedToImage && zoomedToImageScale * 0.8 > scale) {
-      // console.log("clear")
       zoomedToImage = false;
       state.lastZoomed = 0;
       showAllImages();
@@ -1390,29 +1262,17 @@ function zoomToImage(d, duration) {
 
     timeline.update(x1, x2, scale, translate, scale1);
 
-    // toggle zoom overlays
     if (scale > zoomBarrier && !zoomBarrierState) {
       zoomBarrierState = true;
       d3.select(".tagcloud, .crossfilter").classed("hide", true);
-      //d3.select(".filter").classed("hide", true);
       d3.select(".searchbar").classed("hide", true);
       d3.select(".infobar").classed("sneak", true);
-      // d3.select(".filterReset").classed("hide", true);
-      //d3.select(".filterReset").text("Zur Übersicht")
-      // console.log("zoomBarrierState", zoomBarrierState)
     }
     if (scale < zoomBarrier && zoomBarrierState) {
       zoomBarrierState = false;
       d3.select(".tagcloud, .crossfilter").classed("hide", false);
-      //d3.select(".filter").classed("hide", false);
       d3.select(".vorbesitzerinOuter").classed("hide", false);
-      // d3.select(".infobar").classed("sneak", false);
       d3.select(".searchbar").classed("hide", false);
-      //d3.select(".filterReset").text("Filter zurücksetzen")
-
-      // d3.select(".filterReset").classed("hide", false);
-      // console.log("zoomBarrierState", zoomBarrierState)
-
     }
 
     stage2.scale.x = d3.event.scale;
@@ -1430,37 +1290,11 @@ function zoomToImage(d, duration) {
     startScale = scale;
   }
 
-  function createRect(x, y, width, height, color, alpha, targetStage) {
-    // Create a graphics object
-    var graphics = new PIXI.Graphics();
-
-    // Set fill properties
-    graphics.beginFill(color || 0xFFFFFF, alpha || 1);
-
-    // Draw rectangle
-    graphics.drawRect(x, y, width, height);
-
-    // End fill
-    graphics.endFill();
-
-    // Add to target stage (defaulting to stage2 if none specified)
-    (targetStage || stage2).addChild(graphics);
-
-    // Wake up the renderer
-    sleep = false;
-
-    // Return the created graphics object
-    return graphics;
-  }
-
-
   function toScreenPoint(p) {
-    var p2 = [0, 0]
-
-    p2[0] = p[0] / scale - translate[0] / scale
-    p2[1] = p[1] / scale - height - translate[1] / scale
-
-    return p2
+    var p2 = [0, 0];
+    p2[0] = p[0] / scale - translate[0] / scale;
+    p2[1] = p[1] / scale - height - translate[1] / scale;
+    return p2;
   }
 
   var debounceHash = null;
@@ -1468,8 +1302,8 @@ function zoomToImage(d, duration) {
   var userInteraction = false;
 
   function zoomend() {
-    if (!startTranslate) return
-    
+    if (!startTranslate) return;
+
     drag = startTranslate && translate !== startTranslate;
     zooming = false;
     filterVisible();
@@ -1484,157 +1318,130 @@ function zoomToImage(d, duration) {
       loadBigImage(selectedImage, "zoom");
     }
 
-    if (lastSourceEvent) {
-      if (debounceHash) clearTimeout(debounceHash)
+    // NORMALE SHIFT/PAN HANDLUNG NATIVE: URL-Hash NUR aktualisieren, wenn gezielt ein Bild fokusiert ist!
+    if (lastSourceEvent && zoomedToImage) {
+      if (debounceHash) clearTimeout(debounceHash);
       debounceHash = setTimeout(function () {
-        // console.log("debounceHash", userInteraction, zooming, lastSourceEvent);
-        if (zooming) return
+        if (zooming || !zoomedToImage) return;
         var hash = window.location.hash.slice(1);
         var params = new URLSearchParams(hash);
 
         const idsInViewport = canvas.getView();
-        // console.log("idsInViewport", idsInViewport);
         if (idsInViewport.length > 0) {
           params.set("ids", idsInViewport.join(","));
-        } else if (zoomedToImage) {
-          return;
         } else {
           params.delete("ids");
         }
-        window.location.hash = params.toString().replaceAll("%2C", ",")
+        window.location.hash = params.toString().replaceAll("%2C", ",");
         userInteraction = true;
-
-      }, debounceHashTime)
+      }, debounceHashTime);
     }
   }
-
 
   canvas.onhashchange = function () {
     var hash = window.location.hash.slice(1);
     var params = new URLSearchParams(hash);
 
-    console.log("onhashchange", params.toString());
-
     if (params.has("ids") && !userInteraction) {
-      var ids = params.get("ids").split(",")
-      console.log("set setView", ids)
-      // console.log("ids", ids)
-      // if there is a mode in the hash and it is different from the current mode wait 300ms
-      // before setting the view
-      console.log(tags.getSearchTerm(), params.get("search")+ "")
+      var ids = params.get("ids").split(",");
       if (
-        params.has("mode") && params.get("mode") !== state.mode.title ||
-        params.has("filter") && params.get("filter") !== tags.getFilterWords().join(",") ||
+        (params.has("mode") && params.get("mode") !== state.mode.title) ||
+        (params.has("filter") && params.get("filter") !== tags.getFilterWords().join(",")) ||
         params.get("search") !== tags.getSearchTerm()
       ) {
-        console.log("delayed setView due to mode/filter/search change")
-        // temp fix to avoid sticky image
         zoomedToImage = false;
         state.lastZoomed = 0;
         showAllImages();
         clearBigImages();
-        // temp fix end
         setTimeout(function () {
-          canvas.setView(ids)
-        }, hashDelay)
+          canvas.setView(ids);
+        }, hashDelay);
       } else {
-        console.log("setView immediately")
-        canvas.setView(ids)
+        canvas.setView(ids);
       }
     }
 
     if (!params.has("ids") && scale > 1) {
-      console.log("reset zoom because no ids and scale > 1")
-      canvas.resetZoom()
+      canvas.resetZoom();
     }
 
     if (hash === "") {
-      console.log("reset")
-      // reset
-      canvas.removeAllCustomGraphics()
+      canvas.removeAllCustomGraphics();
       canvas.resetZoom(function () {
         tags.reset();
-        utils.setMode()
+        utils.setMode();
         search.reset();
-        //canvas.split();
-      })
-      return
+      });
+      return;
     }
 
     if (params.has("filter")) {
-      var filter = params.get("filter").split(",")
-      // console.log("filter", filter)
-      tags.setFilterWords(filter)
+      var filter = params.get("filter").split(",");
+      tags.setFilterWords(filter);
     } else {
-      tags.setFilterWords([])
+      tags.setFilterWords([]);
     }
 
     if (params.has("search")) {
       var searchTerm = params.get("search");
-      console.log("search term from hash", searchTerm);
-      // Apply search if it's different from current search
       if (tags.getSearchTerm() !== searchTerm) {
         tags.search(searchTerm);
-        // Also update the search input UI if search object exists
-        if (typeof search !== 'undefined' && search.setSearchTerm) {
+        if (typeof search !== "undefined" && search.setSearchTerm) {
           search.setSearchTerm(searchTerm);
         }
       }
     } else {
-      // Clear search if no search parameter in hash
       if (tags.getSearchTerm() && tags.getSearchTerm() !== "") {
         tags.search("");
-        if (typeof search !== 'undefined' && search.reset) {
+        if (typeof search !== "undefined" && search.reset) {
           search.reset();
         }
       }
     }
 
     if (params.has("mode")) {
-      utils.setMode(params.get("mode"))
+      utils.setMode(params.get("mode"));
     } else {
-      utils.setMode()
+      utils.setMode();
     }
 
     if (params.has("borders")) {
-      setTimeout(function () {
-        var borderIds = params.get("borders").split(",")
-        console.log("borders", borderIds)
-        // check if borderIds are in imageBorders
-        updateImageBorders(borderIds);
-      }, params.has("filter") || params.has("mode") ? 2000 : 0)
+      setTimeout(
+        function () {
+          var borderIds = params.get("borders").split(",");
+          updateImageBorders(borderIds);
+        },
+        params.has("filter") || params.has("mode") ? 2000 : 0
+      );
     } else {
-      canvas.removeAllBorders()
+      canvas.removeAllBorders();
     }
 
     if (params.has("vector")) {
-      var vectorVals = params.get("vector")//.split(",").map(function (d) { return parseFloat(d) })
-      console.log("vector Hash", vectorVals)
+      var vectorVals = params.get("vector");
       if (annotationVectors.toString() !== vectorVals.toString()) {
-        annotationVectors = vectorVals
-        canvas.drawVectors()
+        annotationVectors = vectorVals;
+        canvas.drawVectors();
       }
     } else {
-      canvas.removeAllVectors()
+      canvas.removeAllVectors();
     }
 
-
     userInteraction = false;
-
-  }
+  };
 
   canvas.highlight = function () {
-    data.forEach(function (d, i) {
+    data.forEach(function (d) {
       d.alpha = d.highlight ? 1 : 0.2;
     });
     canvas.wakeup();
   };
 
-
   canvas.project = function () {
     ping();
     sleep = false;
-    var scaleFactor = state.mode.type == "group" ? 0.9 : tsneScale[state.mode.title] || 0.5;
+    var scaleFactor =
+      state.mode.type == "group" ? 0.9 : tsneScale[state.mode.title] || 0.5;
     data.forEach(function (d) {
       d.scaleFactor = scaleFactor;
       d.sprite.scale.x = d.scaleFactor;
@@ -1653,8 +1460,6 @@ function zoomToImage(d, duration) {
       cursorCutoff = (1 / scale1) * imageSize * 1;
     }
 
-    //canvas.resetZoom();
-
     zoomedToImageScale =
       (0.8 / (x.rangeBand() / columns / width)) *
       (state.mode.type === "group" ? 1 : 0.5);
@@ -1663,14 +1468,9 @@ function zoomToImage(d, duration) {
   canvas.projectTSNE = function () {
     var marginBottom = -height / 2.5;
 
-    var inactive = data.filter(function (d) {
-      return !d.active;
-    });
+    var inactive = data.filter(function (d) { return !d.active; });
     var inactiveSize = inactive.length;
-
-    var active = data.filter(function (d) {
-      return d.active;
-    });
+    var active = data.filter(function (d) { return d.active; });
 
     var dimension = Math.min(width, height) * 0.8;
 
@@ -1683,22 +1483,17 @@ function zoomToImage(d, duration) {
     });
 
     active.forEach(function (d) {
-      var factor = height / 2;
       var tsneEntry = tsneIndex[state.mode.title][d.id];
       if (tsneEntry) {
         d.x =
           tsneEntry[0] * dimension + width / 2 - dimension / 2 + margin.left;
         d.y = -1 * tsneEntry[1] * dimension;
       } else {
-        // console.log("not found", d)
         d.alpha = 0;
         d.x = 0;
         d.y = 0;
         d.active = false;
       }
-      // var tsneEntry = tsne.find(function (t) {
-      //     return t.id == d.id
-      // })
     });
 
     data.forEach(function (d) {
@@ -1717,72 +1512,75 @@ function zoomToImage(d, duration) {
     });
 
     quadtree = Quadtree(data);
-    //chart.resetZoom();
   };
 
-canvas.resetZoom = function (callback) {
-    var duration = scale > 1 ? 1000 : 100;
-    
-    // 1. Laufende Video- und Audio-Medien sofort stoppen
+  // --- SAUBERES HERAUSZOOMEN UND RESETTEN DES ZUSTANDS ---
+  canvas.resetZoom = function (callback) {
+    var duration = scale > 1 ? 800 : 100;
+
+    // 1. Medien stoppen
     canvas.clearMedia();
 
-    extent = d3.extent(data, function (d) {
-      return d.y;
-    });
+    // 2. Hash-Debounce und Source-Event abbrechen, damit zoomend keine neuen IDs erzeugt
+    if (debounceHash) {
+      clearTimeout(debounceHash);
+      debounceHash = null;
+    }
+    lastSourceEvent = null;
 
+    // 3. IDs sauber aus dem URL-Hash entfernen
+    if (typeof utils !== "undefined" && utils.updateHash) {
+      utils.updateHash("ids", "");
+    } else if (window.location.hash.includes("ids=")) {
+      var params = new URLSearchParams(window.location.hash.slice(1));
+      params.delete("ids");
+      window.location.hash = params.toString();
+    }
+
+    extent = d3.extent(data, function (d) { return d.y; });
     var y = -bottomPadding;
 
-    // 2. Sidebar ausblenden, Tagcloud zeigen und restliche Bilder wieder einblenden
+    // 4. GUI & Texturen aufräumen
     detailContainer.classed("hide", true);
     d3.select(".tagcloud").classed("hide", false);
     showAllImages();
     if (typeof clearBigImages === "function") clearBigImages();
 
-    // Status-Variablen zurücksetzen
+    // 5. Status-Variablen sofort freigeben
     zoomedToImage = false;
     selectedImage = null;
     state.zoomingToImage = false;
+    drag = false;
 
-    // 3. Canvas entsperren
-    setTimeout(function() {
-        vizContainer.style("pointer-events", "auto");
-        zoomedToImage = false;
-        drag = false;
-        selectedImage = null;
-        state.zoomingToImage = false;
-    }, duration + 50);
+    vizContainer.style("pointer-events", "auto");
 
-    // 4. Sanfte Zoom-Animation zurück zur Startansicht
+    // 6. Zurück zur Übersicht animieren
     vizContainer
-      .interrupt() 
+      .interrupt()
       .call(zoom.translate(translate).event)
       .transition()
       .duration(duration)
       .call(zoom.translate([0, y]).scale(1).event)
       .each("end", function () {
+        lastSourceEvent = null;
         if (callback && scale < zoomBarrier) callback();
       });
   };
 
   canvas.split = function () {
     var layout = state.mode.y ? stackYLayout : stackLayout;
-    var active = data.filter(function (d) {
-      return d.active;
-    });
+    var active = data.filter(function (d) { return d.active; });
     layout(active, false);
-    var inactive = data.filter(function (d) {
-      return !d.active;
-    });
+    var inactive = data.filter(function (d) { return !d.active; });
     layout(inactive, true);
     quadtree = Quadtree(data);
   };
-
 
   function filterVisible() {
     var zoomScale = scale;
     if (zoomedToImage) return;
 
-    data.forEach(function (d, i) {
+    data.forEach(function (d) {
       var p = d.sprite.position;
 
       var x = p.x / scale1 + translate[0] / zoomScale;
@@ -1790,10 +1588,10 @@ canvas.resetZoom = function (callback) {
       var padding = 2;
 
       if (
-        x > -padding
-        && x < width / zoomScale + padding
-        && y + height < height / zoomScale + padding
-        && y > height * -1 - padding
+        x > -padding &&
+        x < width / zoomScale + padding &&
+        y + height < height / zoomScale + padding &&
+        y > height * -1 - padding
       ) {
         d.visible = true;
       } else {
@@ -1801,9 +1599,7 @@ canvas.resetZoom = function (callback) {
       }
     });
 
-    var visible = data.filter(function (d) {
-      return d.visible;
-    });
+    var visible = data.filter(function (d) { return d.visible; });
 
     if (visible.length < 40) {
       data.forEach(function (d) {
@@ -1833,9 +1629,7 @@ canvas.resetZoom = function (callback) {
     var texture = new PIXI.Texture.from(url);
     var sprite = new PIXI.Sprite(texture);
 
-    var update = function () {
-      sleep = false;
-    };
+    var update = function () { sleep = false; };
 
     sprite.on("added", update);
     texture.once("update", update);
@@ -1872,7 +1666,6 @@ canvas.resetZoom = function (callback) {
 
     var texture = new PIXI.Texture.from(url);
     var sprite = new PIXI.Sprite(texture);
-    var res = config.loader.textures.big.size;
 
     var updateSize = function (t) {
       var size = Math.max(texture.width, texture.height);
@@ -1899,10 +1692,9 @@ canvas.resetZoom = function (callback) {
         spriteClick = true;
         var pos = s.data.getLocalPosition(s.currentTarget);
         var dir = pos.x > 0 ? 1 : -1;
-        var page = d.page + dir;
-        var nextPage = page;
-        if (page > d.imagenum - 1) nextPage = 0;
-        if (page < 0) nextPage = d.imagenum - 1;
+        var nextPage = d.page + dir;
+        if (nextPage > d.imagenum - 1) nextPage = 0;
+        if (nextPage < 0) nextPage = d.imagenum - 1;
 
         canvas.changePage(d.id, nextPage);
       });
@@ -1916,21 +1708,19 @@ canvas.resetZoom = function (callback) {
     sprite._data = d;
     d.big = true;
     stage5.addChild(sprite);
-if (d._description) {
-      // 1. SOLVE BLURRINESS: Render at an ultra-high resolution internally
+
+    if (d._description) {
       var highResMultiplier = 4;
       var targetScreenFontSize = 32;
-
-      // We wrap the text based on your browser window's width so it's always readable
-      var wrapWidthOnScreen = width * 0.8; // 80% of the screen width
+      var wrapWidthOnScreen = width * 0.8;
 
       var style = new PIXI.TextStyle({
-        fontFamily: 'Lato, Arial, sans-serif',
-        fontSize: targetScreenFontSize * highResMultiplier, 
-        fill: '#000000',
+        fontFamily: "Lato, Arial, sans-serif",
+        fontSize: targetScreenFontSize * highResMultiplier,
+        fill: "#000000",
         wordWrap: true,
         wordWrapWidth: wrapWidthOnScreen * highResMultiplier,
-        align: 'center'
+        align: "center",
       });
 
       var descText = new PIXI.Text(d._description, style);
@@ -1938,20 +1728,18 @@ if (d._description) {
       descText.anchor.y = 0;
       descText.position.x = d.x * scale3 + imageSize3 / 2;
 
-      var updateTextPosition = function() {
+      var updateTextPosition = function () {
         var actualHeight = sprite.height || imageSize3;
         var actualWidth = sprite.width || imageSize3;
-
-        // Calculate how the image scales to the screen to match text scaling
         var screenFitRatio = Math.max(actualWidth / width, actualHeight / height);
         descText.scale.set(screenFitRatio / highResMultiplier);
 
-        var targetScreenGap = 40; 
+        var targetScreenGap = 40;
         var gapInPixi = targetScreenGap * screenFitRatio;
-        
-        descText.position.y = (d.y * scale3 + imageSize3 / 2) + (actualHeight / 2) + gapInPixi;
-        
-        // KEEP AWAKE: Keep the canvas rendering for 5 frames to prevent the "requires a click to snap" bug
+
+        descText.position.y =
+          d.y * scale3 + imageSize3 / 2 + actualHeight / 2 + gapInPixi;
+
         var textureFrames = 5;
         function settleTexturePosition() {
           sleep = false;
@@ -1961,7 +1749,6 @@ if (d._description) {
         settleTexturePosition();
       };
 
-      // Set immediately, and ensure it fires again once the image texture fully loads
       updateTextPosition();
       texture.once("update", updateTextPosition);
 
@@ -1979,9 +1766,7 @@ if (d._description) {
   }
 
   function loadImages() {
-    //return; // remove when finished
-    if (zooming) return;
-    if (zoomedToImage) return;
+    if (zooming || zoomedToImage) return;
 
     if (loadImagesCue.length) {
       var d = loadImagesCue.pop();
@@ -1990,30 +1775,10 @@ if (d._description) {
       }
     }
   }
-canvas.closeDetailAndReset = function() {
-  // 1. Status-Flags zurücksetzen
-  zoomedToImage = false;
-  state.lastZoomed = 0;
 
-  // 2. Alle Thumbnails wieder anzeigen & High-Res Texturen aufräumen
-  showAllImages();
-  clearBigImages();
-
-  // 3. Sidebar / Video-Container ausblenden
-  d3.select(".sidebar").classed("hide", true);
-
-  // 4. URL-Hash leeren (entfernt ?ids=... damit onhashchange nicht blockiert)
-  if (window.location.hash.includes("ids=")) {
-    var params = new URLSearchParams(window.location.hash.slice(1));
-    params.delete("ids");
-    window.location.hash = params.toString();
-  }
-
-  // 5. D3-Zoom zurück auf Startposition animieren
-  canvas.resetZoom();
-};
-
+  canvas.closeDetailAndReset = function () {
+    canvas.resetZoom();
+  };
 
   return canvas;
 }
-
