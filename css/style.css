@@ -1085,3 +1085,54 @@ body:has(.detail:not(.hide):not(.sneak)) .overlay g.active text {
 .detail .media-player-container {
   margin-left: 0px !important; 
 }
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100% !important;  /* 100vw durch 100% ersetzen, um Scrollbar-Offset zu verhindern */
+  height: 100% !important;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+canvas, 
+svg, 
+.viz, 
+.page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.tagcloud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 300px;
+  margin: 0 auto;
+  text-align: center;
+  pointer-events: none;
+  z-index: 50;
+  transform: translateY(-18px);
+}
+
+.timeline, 
+.timeline .container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Verhindert, dass unsichtbare Ränder Klicks abfangen */
+}
+
+.timeline .entry {
+  pointer-events: auto; /* Stellt Klickbarkeit der einzelnen Zeitleisten-Einträge wieder her */
+}
