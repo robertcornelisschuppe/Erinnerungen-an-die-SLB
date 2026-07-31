@@ -1053,3 +1053,21 @@ textarea:focus, input:focus{
     height: 100vh;
   }
 }
+
+.bild-box {
+  display: table;
+  max-width: 100%;
+  margin: 1rem auto;
+}
+
+.bild-box img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.bild-box figcaption {
+  display: table-caption;
+  caption-side: bottom;
+  padding: 0.5rem 0;
+}
