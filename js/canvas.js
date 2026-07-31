@@ -504,7 +504,6 @@ canvas.setView = function (ids, duration) {
   canvas.selectedImage = function () {
     return selectedImage;
   };
-  canvas.zoomedToImage = function () { return zoomedToImage; };
   canvas.x = x;
   canvas.y = yscale;
 
@@ -780,18 +779,17 @@ canvas.init = function (_data, _timeline, _config) {
         if (selectedImage && selectedImage.active === false) return;
         if (timelineHover) return;
         
-  userInteraction = true;
+        userInteraction = true;
 
-  var sidebarOpen = !detailContainer.classed("hide");
-  console.log("[DEBUG click]", "zoomedToImage:", zoomedToImage, "sidebarOpen:", sidebarOpen, "scale:", scale);
-  if (zoomedToImage || sidebarOpen) {
-    console.log("[DEBUG click] -> calling resetZoom()");
-    canvas.resetZoom();
-  } else if (selectedImage) {
-    var calcDuration = Math.round(1400 / Math.sqrt(Math.sqrt(scale)));
-    canvas.setView([selectedImage.id], calcDuration);
-  }
-});
+        if (Math.abs(zoomedToImageScale - scale) < 0.1) {
+          canvas.resetZoom();
+        } else {
+          // FIX: Redirect single clicks directly into our robust setView architecture 
+          // to open the sidebar detail layout and center up perfectly.
+          var calcDuration = Math.round(1400 / Math.sqrt(Math.sqrt(scale)));
+          canvas.setView([selectedImage.id], calcDuration);
+        }
+      });
 
     // disable right click when in edit mode
     vizContainer.on("contextmenu", function () {
@@ -803,20 +801,27 @@ canvas.init = function (_data, _timeline, _config) {
     state.init = true;
 
 window.addEventListener("keydown", function(event) {
-  if (event.key === "Escape" || event.keyCode === 27) {
-    var sidebarOpen = !detailContainer.classed("hide");
-    console.log("[DEBUG escape]", "zoomedToImage:", zoomedToImage, "sidebarOpen:", sidebarOpen, "scale:", scale);
-    if (zoomedToImage || sidebarOpen) {
-      event.preventDefault();
-      event.stopPropagation();
-      console.log("[DEBUG escape] -> calling resetZoom()");
-      canvas.resetZoom();
+    if (event.key === "Escape" || event.keyCode === 27) {
+      // Check the URL directly to see if an item sidebar is currently open
+      var isSidebarOpen = window.location.hash.indexOf("ids=") !== -1;
+
+      if (isSidebarOpen) {
+        // 1st press (or sidebar open): clear the hash to close the sidebar
+        event.preventDefault();
+        event.stopPropagation();
+        if (typeof utils !== "undefined" && utils.updateHash) {
+          utils.updateHash("ids", "");
+        }
+      } else {
+        // 2nd press (or sidebar was already closed manually): zoom out to start view
+        event.preventDefault();
+        event.stopPropagation();
+        canvas.resetZoom();
+      }
     }
-  }
-}, true);
-
-  }; // Ende canvas.init
-
+  }, true);
+};
+  
   var imageBorders = {};
 
   canvas.updateBorderPositions = function () {
@@ -1701,7 +1706,6 @@ function zoomToImage(d, duration) {
   };
 
 canvas.resetZoom = function (callback) {
-    console.log("[DEBUG resetZoom] called, scale before:", scale, "translate before:", translate);
     var duration = scale > 1 ? 1000 : 100;
     canvas.clearMedia();
 
@@ -1712,7 +1716,7 @@ canvas.resetZoom = function (callback) {
     var y = -bottomPadding;
 
     // 1. Instant UI cleanup so it never gets stuck open
-    d3.select(".sidebar").classed("sneak", true).classed("hide", true);
+    d3.select(".sidebar").classed("sneak", true);
     d3.select(".tagcloud").classed("hide", false);
     if (typeof clearBigImages === "function") clearBigImages();
 
@@ -1734,7 +1738,6 @@ canvas.resetZoom = function (callback) {
       .duration(duration)
       .call(zoom.translate([0, y]).scale(1).event)
       .each("end", function () {
-        console.log("[DEBUG resetZoom] transition ended, scale after:", scale, "translate after:", translate);
         if (callback && scale < zoomBarrier) callback();
       });
   };
