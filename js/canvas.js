@@ -1285,76 +1285,81 @@ canvas.getView = function () {
   var debounceHashTime = 400;
   var userInteraction = false;
 
-  function zoomend() {
-    if (!startTranslate) return;
-    
-    drag = startTranslate && translate !== startTranslate;
-    zooming = false;
-    filterVisible();
+function zoomend() {
+  if (!startTranslate) return;
+  
+  drag = startTranslate && translate !== startTranslate;
+  zooming = false;
+  filterVisible();
 
+  if (
+    zoomedToImage &&
+    selectedImage &&
+    !selectedImage.big &&
+    state.lastZoomed != selectedImage.id &&
+    !state.zoomingToImage
+  ) {
+    loadBigImage(selectedImage, "zoom");
+  }
+
+  if (lastSourceEvent) {
+    if (debounceHash) clearTimeout(debounceHash);
+    debounceHash = setTimeout(function () {
+      if (zooming || state.zoomingToImage) return; // FIX: Während Animation abbrechen
+      
+      var hash = window.location.hash.slice(1);
+      var params = new URLSearchParams(hash);
+
+      const idsInViewport = canvas.getView();
+      if (idsInViewport.length > 0) {
+        params.set("ids", idsInViewport.join(","));
+      } else if (zoomedToImage && selectedImage) {
+        params.set("ids", selectedImage.id); // FIX: Fallback
+      } else {
+        params.delete("ids");
+      }
+      
+      userInteraction = true; // FIX: Sicherstellen, dass onhashchange weiß, dass es lokal ausgelöst wurde
+      window.location.hash = params.toString().replaceAll("%2C", ",");
+    }, debounceHashTime);
+  }
+}
+
+canvas.onhashchange = function () {
+  if (state.zoomingToImage) return; // FIX: Animationen nicht unterbrechen
+
+  var hash = window.location.hash.slice(1);
+  var params = new URLSearchParams(hash);
+
+  if (params.has("ids") && !userInteraction) {
+    var ids = params.get("ids").split(",");
     if (
-      zoomedToImage &&
-      selectedImage &&
-      !selectedImage.big &&
-      state.lastZoomed != selectedImage.id &&
-      !state.zoomingToImage
+      params.has("mode") && params.get("mode") !== state.mode.title ||
+      params.has("filter") && params.get("filter") !== tags.getFilterWords().join(",") ||
+      params.get("search") !== tags.getSearchTerm()
     ) {
-      loadBigImage(selectedImage, "zoom");
-    }
-
-    if (lastSourceEvent) {
-      if (debounceHash) clearTimeout(debounceHash);
-      debounceHash = setTimeout(function () {
-        if (zooming) return;
-        var hash = window.location.hash.slice(1);
-        var params = new URLSearchParams(hash);
-
-        const idsInViewport = canvas.getView();
-        if (idsInViewport.length > 0) {
-          params.set("ids", idsInViewport.join(","));
-        } else if (zoomedToImage) {
-          return;
-        } else {
-          params.delete("ids");
-        }
-        window.location.hash = params.toString().replaceAll("%2C", ",");
-        userInteraction = true;
-      }, debounceHashTime);
+      zoomedToImage = false;
+      state.lastZoomed = 0;
+      showAllImages();
+      clearBigImages();
+      setTimeout(function () {
+        canvas.setView(ids);
+      }, hashDelay);
+    } else {
+      canvas.setView(ids);
     }
   }
 
-  canvas.onhashchange = function () {
-    var hash = window.location.hash.slice(1);
-    var params = new URLSearchParams(hash);
-
-    if (params.has("ids") && !userInteraction) {
-      var ids = params.get("ids").split(",");
-      if (
-        params.has("mode") && params.get("mode") !== state.mode.title ||
-        params.has("filter") && params.get("filter") !== tags.getFilterWords().join(",") ||
-        params.get("search") !== tags.getSearchTerm()
-      ) {
-        zoomedToImage = false;
-        state.lastZoomed = 0;
-        showAllImages();
-        clearBigImages();
-        setTimeout(function () {
-          canvas.setView(ids);
-        }, hashDelay);
-      } else {
-        canvas.setView(ids);
-      }
-    }
-
-    if (hash === "") {
-      canvas.removeAllCustomGraphics();
-      canvas.resetZoom(function () {
-        tags.reset();
-        utils.setMode();
-        search.reset();
-      });
-      return;
-    }
+  // FIX: resetZoom nur ausführen, wenn der Hash leer ist UND keine direkte Interaktion stattfand
+  if (hash === "" && !userInteraction) {
+    canvas.removeAllCustomGraphics();
+    canvas.resetZoom(function () {
+      tags.reset();
+      utils.setMode();
+      search.reset();
+    });
+    return;
+  }
 
     if (params.has("filter")) {
       var filter = params.get("filter").split(",");
