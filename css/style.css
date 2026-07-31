@@ -1054,35 +1054,32 @@ textarea:focus, input:focus{
   }
 }
 
-/* 1. Richtet Absätze/Container mit Bildern wie eine Tabelle aus */
+
+/* 1. Zwingt den Bild-Container, sich exakt auf die Bildbreite zusammenzuziehen */
+.detail .content:has(img),
 .detail .content figure,
 .detail .content p:has(img) {
   display: table !important;
-  width: fit-content !important;
+  width: 1% !important;             /* Der Trick: Zwingt den Container auf minimale Bildbreite */
+  min-width: min-content !important;
   max-width: 100% !important;
   margin: 1rem 0 !important;
 }
 
-/* 2. Zwingt Bilder, maximal die verfügbare Breite zu nutzen */
+/* 2. Bild im Hochformat korrekt skalieren */
 .detail .content img {
   display: block !important;
   max-width: 100% !important;
   height: auto !important;
 }
 
-/* 3. Ordnet die Unterschrift als Tabellen-Untertitel unter dem Bild an */
-.detail .content figcaption {
+/* 3. Untertitel aus der Breitenberechnung des Containers herausnehmen */
+.detail .content figcaption,
+.detail .content p:not(:has(img)),
+.detail .content span {
   display: table-caption !important;
   caption-side: bottom !important;
   padding-top: 0.5rem !important;
   word-break: break-word !important;
   overflow-wrap: anywhere !important;
-}
-
-/* 4. Verhindert generell das Überstehen von Texten in der Sidebar */
-.detail .content,
-.detail .content p,
-.detail .content span {
-  word-break: break-word;
-  overflow-wrap: anywhere;
 }
