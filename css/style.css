@@ -1079,7 +1079,7 @@ body:has(.detail:not(.hide):not(.sneak)) .overlay g.active text {
 
 .detail .slidebutton {
   z-index: 999 !important; /* Bringt den Pfeil in den Vordergrund */
-  left: 30px !important;    /* Verschiebt den Pfeil weiter an den linken Rand */
+  left: 15px !important;    /* Verschiebt den Pfeil weiter an den linken Rand */
 }
 
 .detail .media-player-container {
