@@ -1110,18 +1110,38 @@ svg,
 }
 
 .tagcloud {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
+  position: absolute !important;
+  top: 0 !important;
+  left: 50% !important;               /* An der horizontalen Mitte verankern */
+  right: auto !important;
+  width: 100% !important;
+  max-width: 100vw !important;
   height: 300px;
-  margin: 0 auto;
+  margin: 0 !important;
+  text-align: center;
   pointer-events: none;
   z-index: 50;
   color: rgb(247, 239, 205);
-  transform: translateY(-18px);
-  transition: transform 0.3s ease-in-out;
+  
+  /* ZENTRIERUNG & URSPRUNG BEIM ZOOMEN: */
+  transform-origin: center top !important;
+  transform: translateX(-50%) translateY(-18px) !important;
+  transition: opacity 0.3s ease;
+}
+
+/* Zustände der Tagcloud mit beibehaltener X-Zentrierung */
+.tagcloud.open {
+  transform: translateX(-50%) translateY(32px) !important;
+}
+
+.tagcloud.hide {
+  transform: translateX(-50%) translateY(-370px) !important;
+}
+
+/* Einzelne Schlagwörter symmetrisch von ihrer eigenen Mitte aus skalieren */
+.tagcloud .tag {
+  transform-origin: center center !important; /* Ersetzt transform-origin: 0 0 */
+  pointer-events: auto;
 }
 
 .timeline, 
