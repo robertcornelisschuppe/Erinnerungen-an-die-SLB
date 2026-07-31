@@ -151,19 +151,13 @@ function init() {
         }, 250);
       }
     })
-.on("keydown", function (e) {
-  if (d3.event.keyCode != 27) return;
-
-  // Wenn Sidebar/Bild-Zoom aktiv ist, das komplett canvas.js überlassen
-  // (verhindert Race Conditions mit resetZoom())
-  if (canvas.zoomedToImage && canvas.zoomedToImage()) return;
-  if (!d3.select(".sidebar").classed("hide")) return;
-
-  search.reset();
-  tags.reset();
-  canvas.split();
-  window.location.hash = "";
-});
+    .on("keydown", function (e) {
+      if (d3.event.keyCode != 27) return;
+      search.reset();
+      tags.reset();
+      canvas.split();
+      window.location.hash = "";
+    });
 
   d3.select(".filterReset").on("click", function () {
     canvas.resetZoom(function () {
@@ -283,4 +277,3 @@ function updateHash(name, value, clear = undefined) {
 }
 
 utils.updateHash = updateHash;
-
