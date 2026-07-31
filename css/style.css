@@ -1054,20 +1054,35 @@ textarea:focus, input:focus{
   }
 }
 
-.bild-box {
-  display: table;
-  max-width: 100%;
-  margin: 1rem auto;
+/* 1. Richtet Absätze/Container mit Bildern wie eine Tabelle aus */
+.detail .content figure,
+.detail .content p:has(img) {
+  display: table !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  margin: 1rem 0 !important;
 }
 
-.bild-box img {
-  display: block;
-  max-width: 100%;
-  height: auto;
+/* 2. Zwingt Bilder, maximal die verfügbare Breite zu nutzen */
+.detail .content img {
+  display: block !important;
+  max-width: 100% !important;
+  height: auto !important;
 }
 
-.bild-box figcaption {
-  display: table-caption;
-  caption-side: bottom;
-  padding: 0.5rem 0;
+/* 3. Ordnet die Unterschrift als Tabellen-Untertitel unter dem Bild an */
+.detail .content figcaption {
+  display: table-caption !important;
+  caption-side: bottom !important;
+  padding-top: 0.5rem !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+}
+
+/* 4. Verhindert generell das Überstehen von Texten in der Sidebar */
+.detail .content,
+.detail .content p,
+.detail .content span {
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
