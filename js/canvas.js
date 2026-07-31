@@ -783,7 +783,9 @@ canvas.init = function (_data, _timeline, _config) {
   userInteraction = true;
 
   var sidebarOpen = !detailContainer.classed("hide");
+  console.log("[DEBUG click]", "zoomedToImage:", zoomedToImage, "sidebarOpen:", sidebarOpen, "scale:", scale);
   if (zoomedToImage || sidebarOpen) {
+    console.log("[DEBUG click] -> calling resetZoom()");
     canvas.resetZoom();
   } else if (selectedImage) {
     var calcDuration = Math.round(1400 / Math.sqrt(Math.sqrt(scale)));
@@ -803,12 +805,11 @@ canvas.init = function (_data, _timeline, _config) {
 window.addEventListener("keydown", function(event) {
   if (event.key === "Escape" || event.keyCode === 27) {
     var sidebarOpen = !detailContainer.classed("hide");
+    console.log("[DEBUG escape]", "zoomedToImage:", zoomedToImage, "sidebarOpen:", sidebarOpen, "scale:", scale);
     if (zoomedToImage || sidebarOpen) {
       event.preventDefault();
       event.stopPropagation();
-      if (typeof utils !== "undefined" && utils.updateHash) {
-        utils.updateHash("ids", "");
-      }
+      console.log("[DEBUG escape] -> calling resetZoom()");
       canvas.resetZoom();
     }
   }
@@ -1700,6 +1701,7 @@ function zoomToImage(d, duration) {
   };
 
 canvas.resetZoom = function (callback) {
+    console.log("[DEBUG resetZoom] called, scale before:", scale, "translate before:", translate);
     var duration = scale > 1 ? 1000 : 100;
     canvas.clearMedia();
 
@@ -1732,6 +1734,7 @@ canvas.resetZoom = function (callback) {
       .duration(duration)
       .call(zoom.translate([0, y]).scale(1).event)
       .each("end", function () {
+        console.log("[DEBUG resetZoom] transition ended, scale after:", scale, "translate after:", translate);
         if (callback && scale < zoomBarrier) callback();
       });
   };
