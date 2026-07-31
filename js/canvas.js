@@ -813,7 +813,9 @@ window.addEventListener("keydown", function(event) {
     }
   }
 }, true);
-  
+
+  }; // Ende canvas.init
+
   var imageBorders = {};
 
   canvas.updateBorderPositions = function () {
