@@ -999,7 +999,7 @@ function Canvas() {
     renderer.render(stage);
   }
 
-  // FIX: Dynamische Zoom- und Skalierungslogik für maximierte Bilder
+  // FIX: Dynamische Zoom- und Skalierungslogik mit extra Platz für Bildunterschriften
   function zoomToImage(d, duration) {
     state.zoomingToImage = true;
     vizContainer.style("pointer-events", "none");
@@ -1011,7 +1011,7 @@ function Canvas() {
 
     d3.select(".tagcloud").classed("hide", true);
 
-    // 1. Exakte Sidebar-Breite aus dem DOM ermitteln
+    // 1. Exakte Sidebar-Breite ermitteln
     var detailNode = d3.select(".detail").node();
     var sidebarWidth = 0;
     if (detailNode && !detailContainer.classed("hide") && !detailContainer.classed("sneak")) {
@@ -1021,15 +1021,24 @@ function Canvas() {
       sidebarWidth = Math.min(500, widthOuter * 0.35);
     }
 
-    // 2. Verfügbaren Viewport abzüglich Sidebar & dynamischem Rand berechnen
+    // 2. Verfügbaren Viewport abzüglich Sidebar & vergrößertem Rand berechnen
     var availWidth = Math.max(200, widthOuter - sidebarWidth);
     var availHeight = height;
 
-    var marginX = Math.max(20, Math.min(60, availWidth * 0.05));
-    var marginY = Math.max(20, Math.min(60, availHeight * 0.05));
+    // Allgemeiner seitlicher und oberer Rand (ca. 8%)
+    var marginX = Math.max(40, Math.min(100, availWidth * 0.08));
+    var marginTop = Math.max(40, Math.min(100, availHeight * 0.08));
+
+    // Prüfen, ob eine Bildunterschrift vorhanden ist
+    var hasDescription = Boolean(d._description && d._description.toString().trim() !== "");
+    
+    // Wenn eine Bildunterschrift da ist: unten deutlich mehr Platz einräumen (bis zu 22% der Höhe)
+    var marginBottom = hasDescription
+      ? Math.max(120, Math.min(240, availHeight * 0.22))
+      : Math.max(50, Math.min(120, availHeight * 0.10));
 
     var targetViewportWidth = availWidth - 2 * marginX;
-    var targetViewportHeight = availHeight - 2 * marginY;
+    var targetViewportHeight = availHeight - marginTop - marginBottom;
 
     // 3. Bildseitenverhältnis (Aspect Ratio) bestimmen
     var texW = 1;
@@ -1055,14 +1064,15 @@ function Canvas() {
     var imgStage2Width = aspect >= 1 ? baseSize : baseSize * aspect;
     var imgStage2Height = aspect >= 1 ? baseSize / aspect : baseSize;
 
-    // 4. Optimalen Zoomfaktor ermitteln, der voll ins Fenster passt
+    // 4. Zoomfaktor berechnen
     var scaleX = targetViewportWidth / imgStage2Width;
     var scaleY = targetViewportHeight / imgStage2Height;
     var targetScale = Math.min(scaleX, scaleY);
 
-    // 5. Bildmitte exakt im verbleibenden Bildbereich zentrieren
+    // 5. Zentrierung: Bei Bildunterschriften schieben wir das Bild etwas nach oben,
+    // damit Bild + Text zusammen exakt die Mitte der verfügbaren Fläche bilden
     var visibleCenterX = availWidth / 2;
-    var visibleCenterY = availHeight / 2;
+    var visibleCenterY = marginTop + (targetViewportHeight / 2);
 
     var imgCenterX = d.x + rangeBandImage / 2;
     var imgCenterY = height + d.y + rangeBandImage / 2;
@@ -1633,7 +1643,6 @@ function Canvas() {
         d.alpha = 0;
         d.alpha2 = 0;
       }
-      // Automatischer Feinschliff, falls die hochauflösende Textur fertig geladen wurde
       if (zoomedToImage && selectedImage && selectedImage.id === d.id && !state.zoomingToImage) {
         zoomToImage(d, 300);
       }
