@@ -113,7 +113,7 @@ function Canvas() {
   var tsneIndex = {};
   var tsneScale = {};
   var mediaPlayerContainer;
-  var currentMediaLink = null; // Verhindert Video-Flackern
+  var currentMediaLink = null;
 
   function canvas() { }
 
@@ -262,7 +262,6 @@ function Canvas() {
       return;
     }
 
-    // FIX: Kein Flackern mehr, falls das Video desselben Eintrags bereits geladen ist
     if (currentMediaLink === link && mediaPlayerContainer && mediaPlayerContainer.html() !== "") {
       return;
     }
@@ -687,10 +686,8 @@ function Canvas() {
         
         userInteraction = true;
 
-        // FIX: Nur herauszoomen, wenn genau DAS BEREITS VERGRÖSSERTE BILD nochmals geklickt wird
-        if (zoomedToImage && selectedImage && selectedImage.id === (selectedImageDistance < cursorCutoff ? selectedImage.id : null)) {
-          canvas.resetZoom();
-        } else if (selectedImage) {
+        // FIX: Kein automatisches Herauszoomen mehr bei Klicks
+        if (selectedImage) {
           var calcDuration = Math.round(1400 / Math.sqrt(Math.sqrt(scale)));
           canvas.setView([selectedImage.id], calcDuration);
         }
@@ -833,13 +830,16 @@ function Canvas() {
 
     selectedImageDistance = best && best.d || 1000;
 
-    if (best && best.p && !zoomedToImage) {
+    // FIX: selectedImage wird auch beim gezoomten Zustand immer korrekt aktualisiert
+    if (best && best.p) {
       var d = best.p;
-      var center = [
-        (d.x + imgPadding) * scale + translate[0],
-        (height + d.y + imgPadding) * scale + translate[1],
-      ];
-      zoom.center(center);
+      if (!zoomedToImage) {
+        var center = [
+          (d.x + imgPadding) * scale + translate[0],
+          (height + d.y + imgPadding) * scale + translate[1],
+        ];
+        zoom.center(center);
+      }
       selectedImage = d;
     }
 
@@ -1041,8 +1041,6 @@ function Canvas() {
       hideTheRest(d);
     }, duration / 2);
 
-    // FIX: Lineare Frame-für-Frame Interpolation anstelle von d3.interpolateZoom
-    // Verhindert das Ausholen/Herauszoomen
     var startS = scale;
     var startT = [translate[0], translate[1]];
     var iScale = d3.interpolateNumber(startS, targetScale);
@@ -1111,7 +1109,6 @@ function Canvas() {
     detailVue.page = d.page;
     detailVue.item = detailData;
 
-    // FIX: Nur Medien laden, falls nicht bereits vorhanden
     if (d.media_link) {
       canvas.loadMedia(d);
     } else {
@@ -1296,9 +1293,7 @@ function Canvas() {
       }
     }
 
-    if (!params.has("ids") && scale > 1) {
-      canvas.resetZoom();
-    }
+    // FIX: Automatisches ResetZoom bei fehlenden IDs entfernt
 
     if (hash === "") {
       canvas.removeAllCustomGraphics();
