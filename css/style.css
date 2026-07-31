@@ -47,8 +47,6 @@ body {
   background-color: #fafafa;
 }
 
-
-
 canvas {
   position: absolute;
   /* cursor: pointer; */
@@ -213,7 +211,6 @@ canvas {
 .browserInfo.show {
   display: block;
 }
-
 
  .language-container {
     /* float: left; */
