@@ -1054,3 +1054,13 @@ textarea:focus, input:focus{
   }
 }
 
+.stooltip {
+  max-width: 70vw !important; /* Nutzt auf dem Handy bis zu 70 % der Bildschirmbreite */
+}
+
+/* Für größere Bildschirme (ab 768px Breite) */
+@media (min-width: 768px) {
+  .stooltip {
+    max-width: 25vw !important; /* Nutzt am PC maximal 25 % der Bildschirmbreite */
+  }
+}
