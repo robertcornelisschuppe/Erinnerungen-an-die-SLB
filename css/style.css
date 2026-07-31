@@ -1054,13 +1054,13 @@ textarea:focus, input:focus{
   }
 }
 
-.stooltip {
-  max-width: 70vw !important; /* Nutzt auf dem Handy bis zu 70 % der Bildschirmbreite */
+.overlay text {
+  inline-size: 110px !important;       
+  white-space: pre-wrap !important;
+  text-anchor: middle !important;
 }
 
-/* Für größere Bildschirme (ab 768px Breite) */
-@media (min-width: 768px) {
-  .stooltip {
-    max-width: 25vw !important; /* Nutzt am PC maximal 25 % der Bildschirmbreite */
-  }
+.stooltip text {
+  inline-size: 160px !important;
+  white-space: pre-wrap !important;
 }
