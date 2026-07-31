@@ -549,67 +549,88 @@ function Canvas() {
       imageSize3 = config.loader.textures.big.size;
     }
 
-    canvas.resize = function () {
-      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
-        return;
-      }
+canvas.resize = function () {
+  if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+    return;
+  }
 
-      if (!state.init) return;
+  if (!state.init) return;
 
-      var oldWidth = width;
-      var oldHeight = height;
-      var oldTranslateY = translate[1];
+  var oldWidth = width;
+  var oldHeight = height;
+  var oldTranslateY = translate[1];
 
-      widthOuter = window.innerWidth;
-      width = widthOuter - margin.left - margin.right;
-      height = window.innerHeight;
-      
-      resolution = window.devicePixelRatio || 1;
+  widthOuter = window.innerWidth;
+  width = widthOuter - margin.left - margin.right;
+  height = window.innerHeight;
+  
+  resolution = window.devicePixelRatio || 1;
 
-      if (renderer) {
-        renderer.resolution = resolution;
-        renderer.resize(widthOuter, height);
-        renderer.view.style.width = widthOuter + "px";
-        renderer.view.style.height = height + "px";
-      }
-      if (zoom) zoom.size([width, height]);
+  if (renderer) {
+    renderer.resolution = resolution;
+    renderer.resize(widthOuter, height);
+    renderer.view.style.width = widthOuter + "px";
+    renderer.view.style.height = height + "px";
+  }
+  if (zoom) zoom.size([width, height]);
 
-      var widthRatio = oldWidth > 0 ? width / oldWidth : 1;
+  var widthRatio = oldWidth > 0 ? width / oldWidth : 1;
 
-      canvas.makeScales();
-      canvas.project();
+  canvas.makeScales();
+  canvas.project();
 
-      data.forEach(function(d) {
-        if (d.sprite) {
-          d.sprite.position.x = d.x1;
-          d.sprite.position.y = d.y1;
-        }
-        if (d.sprite2) {
-          d.sprite2.position.x = d.x * scale2 + imageSize2 / 2;
-          d.sprite2.position.y = d.y * scale2 + imageSize2 / 2;
-        }
-      });
-      
-      if (canvas.updateBorderPositions) canvas.updateBorderPositions();
+  data.forEach(function(d) {
+    if (d.sprite) {
+      d.sprite.position.x = d.x1;
+      d.sprite.position.y = d.y1;
+    }
+    if (d.sprite2) {
+      d.sprite2.position.x = d.x * scale2 + imageSize2 / 2;
+      d.sprite2.position.y = d.y * scale2 + imageSize2 / 2;
+    }
+  });
+  
+  if (canvas.updateBorderPositions) canvas.updateBorderPositions();
 
-      if (zoomedToImage && selectedImage) {
-        if (typeof clearBigImages === "function") clearBigImages();
-        if (canvas.setView) {
-          canvas.setView([selectedImage.id], 0); 
-        }
-      } else {
-        translate[0] = translate[0] * widthRatio;
-        translate[1] = (height / 2) - ((oldHeight / 2 - oldTranslateY - oldHeight * scale) * widthRatio) - (height * scale);
-        
-        zoom.translate(translate);
-        stage2.x = translate[0];
-        stage2.y = translate[1];
-      }
+  if (zoomedToImage && selectedImage) {
+    if (typeof clearBigImages === "function") clearBigImages();
+    if (canvas.setView) {
+      canvas.setView([selectedImage.id], 0); 
+    }
+  } else {
+    translate[0] = translate[0] * widthRatio;
+    translate[1] = (height / 2) - ((oldHeight / 2 - oldTranslateY - oldHeight * scale) * widthRatio) - (height * scale);
+    
+    zoom.translate(translate);
+    stage2.x = translate[0];
+    stage2.y = translate[1];
+  }
 
-      sleep = false;
-      if (typeof animate === "function") animate();
-    };
-        
+  // Synchronisiert die HTML-Zeitleiste bei Browser-Zoom/Resize mit dem Canvas
+  if (typeof timeline !== "undefined") {
+    if (typeof timeline.resize === "function") {
+      timeline.resize(width, height);
+    }
+    var x1 = (-1 * translate[0]) / scale;
+    var x2 = x1 + widthOuter / scale;
+    if (typeof timeline.update === "function") {
+      timeline.update(x1, x2, scale, translate, scale1);
+    }
+  }
+
+  // Synchronisiert die Schlagwortleiste (Tagcloud) mit der neuen Fensterbreite
+  if (typeof tags !== "undefined") {
+    if (typeof tags.resize === "function") {
+      tags.resize(width, height);
+    }
+    if (typeof tags.update === "function") {
+      tags.update();
+    }
+  }
+
+  sleep = false;
+  if (typeof animate === "function") animate();
+};        
     window.addEventListener("resize", canvas.resize);
         
     var renderOptions = {
