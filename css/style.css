@@ -1054,12 +1054,14 @@ textarea:focus, input:focus{
   }
 }
 
-.overlay text {
-  inline-size: 110px !important;       
-  white-space: pre-wrap !important;
-  text-anchor: middle !important;
+body:has(.detail:not(.hide):not(.sneak)) .overlay text {
+  display: block !important;
+  font-size: 13px !important;
+  font-weight: bold;
+  fill: #ffffff !important;
 }
 
+/* Tooltip beim Drüberfahren mit der Maus (falls gewünscht, sonst auch ausblendbar) */
 .stooltip text {
   inline-size: 160px !important;
   white-space: pre-wrap !important;
