@@ -1079,5 +1079,5 @@ body:has(.detail:not(.hide):not(.sneak)) .overlay g.active text {
 }
 
 .video-container {
-  margin-left: 40px; /* Schafft links Platz für den Button */
+  margin-left: 100px;
 }
