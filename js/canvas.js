@@ -686,7 +686,6 @@ function Canvas() {
         
         userInteraction = true;
 
-        // FIX: Kein automatisches Herauszoomen mehr bei Klicks
         if (selectedImage) {
           var calcDuration = Math.round(1400 / Math.sqrt(Math.sqrt(scale)));
           canvas.setView([selectedImage.id], calcDuration);
@@ -830,7 +829,6 @@ function Canvas() {
 
     selectedImageDistance = best && best.d || 1000;
 
-    // FIX: selectedImage wird auch beim gezoomten Zustand immer korrekt aktualisiert
     if (best && best.p) {
       var d = best.p;
       if (!zoomedToImage) {
@@ -1001,40 +999,79 @@ function Canvas() {
     renderer.render(stage);
   }
 
+  // FIX: Dynamische Zoom- und Skalierungslogik für maximierte Bilder
   function zoomToImage(d, duration) {
     state.zoomingToImage = true;
     vizContainer.style("pointer-events", "none");
     zoom.center(null);
-    
+
+    showDetail(d);
     loadMiddleImage(d);
     loadBigImage(d, "click");
-    
+
     d3.select(".tagcloud").classed("hide", true);
 
-    var padding = rangeBandImage / 2;
-    var max = Math.max(width, height);
-    var targetScale = 1 / (rangeBandImage / (max * 0.85));
-    
-    var imageAspectRatio = 1;
-    if (d.sprite && d.sprite.texture && d.sprite.texture.width > 0) {
-      imageAspectRatio = d.sprite.texture.height / d.sprite.texture.width;
-    } else if (d.sprite && d.sprite.width > 0) {
-      imageAspectRatio = d.sprite.height / d.sprite.width;
+    // 1. Exakte Sidebar-Breite aus dem DOM ermitteln
+    var detailNode = d3.select(".detail").node();
+    var sidebarWidth = 0;
+    if (detailNode && !detailContainer.classed("hide") && !detailContainer.classed("sneak")) {
+      sidebarWidth = detailNode.getBoundingClientRect().width;
     }
-    var screenImageHeight = (rangeBandImage * targetScale) * imageAspectRatio;
-    var maxScreenHeight = height * 0.9; 
-    if (screenImageHeight > maxScreenHeight) {
-      targetScale = targetScale * (maxScreenHeight / screenImageHeight);
+    if (sidebarWidth === 0 && !utils.isMobile() && !isInIframe) {
+      sidebarWidth = Math.min(500, widthOuter * 0.35);
     }
-    
-    var currentSidebarWidth = Math.min(700, widthOuter * 0.4);
-    var visibleCenter = (width - currentSidebarWidth) / 2;
+
+    // 2. Verfügbaren Viewport abzüglich Sidebar & dynamischem Rand berechnen
+    var availWidth = Math.max(200, widthOuter - sidebarWidth);
+    var availHeight = height;
+
+    var marginX = Math.max(20, Math.min(60, availWidth * 0.05));
+    var marginY = Math.max(20, Math.min(60, availHeight * 0.05));
+
+    var targetViewportWidth = availWidth - 2 * marginX;
+    var targetViewportHeight = availHeight - 2 * marginY;
+
+    // 3. Bildseitenverhältnis (Aspect Ratio) bestimmen
+    var texW = 1;
+    var texH = 1;
+
+    if (d.sprite2 && d.sprite2.texture && d.sprite2.texture.valid && d.sprite2.texture.width > 1) {
+      texW = d.sprite2.texture.width;
+      texH = d.sprite2.texture.height;
+    } else if (d.sprite && d.sprite.texture && d.sprite.texture.valid && d.sprite.texture.width > 1) {
+      texW = d.sprite.texture.width;
+      texH = d.sprite.texture.height;
+    } else if (d.aspect_ratio) {
+      var parts = d.aspect_ratio.split(":");
+      if (parts.length === 2) {
+        texW = parseFloat(parts[0]) || 1;
+        texH = parseFloat(parts[1]) || 1;
+      }
+    }
+
+    var aspect = texW / texH;
+    var baseSize = rangeBandImage * (d.scaleFactor || 1);
+
+    var imgStage2Width = aspect >= 1 ? baseSize : baseSize * aspect;
+    var imgStage2Height = aspect >= 1 ? baseSize / aspect : baseSize;
+
+    // 4. Optimalen Zoomfaktor ermitteln, der voll ins Fenster passt
+    var scaleX = targetViewportWidth / imgStage2Width;
+    var scaleY = targetViewportHeight / imgStage2Height;
+    var targetScale = Math.min(scaleX, scaleY);
+
+    // 5. Bildmitte exakt im verbleibenden Bildbereich zentrieren
+    var visibleCenterX = availWidth / 2;
+    var visibleCenterY = availHeight / 2;
+
+    var imgCenterX = d.x + rangeBandImage / 2;
+    var imgCenterY = height + d.y + rangeBandImage / 2;
 
     var translateNow = [
-      visibleCenter - targetScale * (d.x + padding),
-      height / 2 - targetScale * (height + d.y + padding)
+      visibleCenterX - targetScale * imgCenterX,
+      visibleCenterY - targetScale * imgCenterY
     ];
-  
+
     zoomedToImageScale = targetScale;
 
     setTimeout(function () {
@@ -1077,7 +1114,6 @@ function Canvas() {
         zoomedToImage = true;
         selectedImage = d;
         hideTheRest(d);
-        showDetail(d);
         state.zoomingToImage = false;
         vizContainer.style("pointer-events", "auto");
         utils.updateHash("ids", d.id, ["translate", "scale"]);
@@ -1292,8 +1328,6 @@ function Canvas() {
         canvas.setView(ids);
       }
     }
-
-    // FIX: Automatisches ResetZoom bei fehlenden IDs entfernt
 
     if (hash === "") {
       canvas.removeAllCustomGraphics();
@@ -1598,6 +1632,10 @@ function Canvas() {
       if (t.valid) {
         d.alpha = 0;
         d.alpha2 = 0;
+      }
+      // Automatischer Feinschliff, falls die hochauflösende Textur fertig geladen wurde
+      if (zoomedToImage && selectedImage && selectedImage.id === d.id && !state.zoomingToImage) {
+        zoomToImage(d, 300);
       }
     };
 
