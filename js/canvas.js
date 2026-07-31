@@ -315,14 +315,11 @@ function Canvas() {
     }
   };
 
-canvas.getView = function () {
-  // FIX: Wenn auf ein Bild gezoomt ist, immer direkt die ID des Bildes liefern
-  if (zoomedToImage && selectedImage && selectedImage.id) {
-    return [selectedImage.id];
-  }
+  canvas.getView = function () {
+    if (zoomedToImage && selectedImage && selectedImage.id) {
+      return [selectedImage.id];
+    }
 
-    var visibleItems = [];
-    var invScale = 1 / scale;
     var visibleItems = [];
     var invScale = 1 / scale;
     var viewLeft = (-translate[0] * invScale);
@@ -703,23 +700,36 @@ canvas.getView = function () {
       if (window.top == window.self) d3.event.preventDefault();
     });
 
+    d3.select(".detail .slidebutton").on("click", function () {
+      zoomedToImage = false;
+      selectedImage = null;
+      state.lastZoomed = 0;
+      clearBigImages();
+      showAllImages();
+      detailContainer.classed("hide", true);
+      canvas.resetZoom();
+      if (typeof utils !== "undefined" && utils.updateHash) {
+        utils.updateHash("ids", "");
+      }
+    });
+
     animate();
     state.init = true;
 
     window.addEventListener("keydown", function(event) {
       if (event.key === "Escape" || event.keyCode === 27) {
-        var isSidebarOpen = window.location.hash.indexOf("ids=") !== -1;
-        if (isSidebarOpen) {
-          event.preventDefault();
-          event.stopPropagation();
-          if (typeof utils !== "undefined" && utils.updateHash) {
-            utils.updateHash("ids", "");
-          }
-        } else {
-          event.preventDefault();
-          event.stopPropagation();
-          canvas.resetZoom();
+        event.preventDefault();
+        event.stopPropagation();
+        zoomedToImage = false;
+        selectedImage = null;
+        state.lastZoomed = 0;
+        clearBigImages();
+        showAllImages();
+        detailContainer.classed("hide", true);
+        if (typeof utils !== "undefined" && utils.updateHash) {
+          utils.updateHash("ids", "");
         }
+        canvas.resetZoom();
       }
     }, true);
   };
@@ -836,7 +846,7 @@ canvas.getView = function () {
 
     selectedImageDistance = best && best.d || 1000;
 
-    if (best && best.p) {
+    if (best && best.p && selectedImageDistance < cursorCutoff) {
       var d = best.p;
       if (!zoomedToImage) {
         var center = [
@@ -846,6 +856,8 @@ canvas.getView = function () {
         zoom.center(center);
       }
       selectedImage = d;
+    } else if (!zoomedToImage) {
+      selectedImage = null;
     }
 
     container.style("cursor", function () {
@@ -1006,7 +1018,6 @@ canvas.getView = function () {
     renderer.render(stage);
   }
 
-  // FIX: Dynamische Zoom- und Skalierungslogik mit extra Platz für Bildunterschriften
   function zoomToImage(d, duration) {
     state.zoomingToImage = true;
     vizContainer.style("pointer-events", "none");
@@ -1018,7 +1029,6 @@ canvas.getView = function () {
 
     d3.select(".tagcloud").classed("hide", true);
 
-    // 1. Exakte Sidebar-Breite ermitteln
     var detailNode = d3.select(".detail").node();
     var sidebarWidth = 0;
     if (detailNode && !detailContainer.classed("hide") && !detailContainer.classed("sneak")) {
@@ -1028,18 +1038,14 @@ canvas.getView = function () {
       sidebarWidth = Math.min(500, widthOuter * 0.35);
     }
 
-    // 2. Verfügbaren Viewport abzüglich Sidebar & vergrößertem Rand berechnen
     var availWidth = Math.max(200, widthOuter - sidebarWidth);
     var availHeight = height;
 
-    // Allgemeiner seitlicher und oberer Rand (ca. 8%)
     var marginX = Math.max(40, Math.min(100, availWidth * 0.08));
     var marginTop = Math.max(40, Math.min(100, availHeight * 0.08));
 
-    // Prüfen, ob eine Bildunterschrift vorhanden ist
     var hasDescription = Boolean(d._description && d._description.toString().trim() !== "");
     
-    // Wenn eine Bildunterschrift da ist: unten deutlich mehr Platz einräumen (bis zu 22% der Höhe)
     var marginBottom = hasDescription
       ? Math.max(120, Math.min(240, availHeight * 0.22))
       : Math.max(50, Math.min(120, availHeight * 0.10));
@@ -1047,7 +1053,6 @@ canvas.getView = function () {
     var targetViewportWidth = availWidth - 2 * marginX;
     var targetViewportHeight = availHeight - marginTop - marginBottom;
 
-    // 3. Bildseitenverhältnis (Aspect Ratio) bestimmen
     var texW = 1;
     var texH = 1;
 
@@ -1071,13 +1076,10 @@ canvas.getView = function () {
     var imgStage2Width = aspect >= 1 ? baseSize : baseSize * aspect;
     var imgStage2Height = aspect >= 1 ? baseSize / aspect : baseSize;
 
-    // 4. Zoomfaktor berechnen
     var scaleX = targetViewportWidth / imgStage2Width;
     var scaleY = targetViewportHeight / imgStage2Height;
     var targetScale = Math.min(scaleX, scaleY);
 
-    // 5. Zentrierung: Bei Bildunterschriften schieben wir das Bild etwas nach oben,
-    // damit Bild + Text zusammen exakt die Mitte der verfügbaren Fläche bilden
     var visibleCenterX = availWidth / 2;
     var visibleCenterY = marginTop + (targetViewportHeight / 2);
 
@@ -1192,6 +1194,7 @@ canvas.getView = function () {
       d.alpha = d.active ? 1 : 0.2;
       d.alpha2 = d.visible ? 1 : 0;
     });
+    sleep = false;
   }
 
   var zoomBarrierState = false;
@@ -1239,6 +1242,7 @@ canvas.getView = function () {
     if (zoomedToImage && zoomedToImageScale * 0.8 > scale) {
       zoomedToImage = false;
       state.lastZoomed = 0;
+      selectedImage = null;
       showAllImages();
       clearBigImages();
       detailContainer.classed("hide", true);
@@ -1285,81 +1289,92 @@ canvas.getView = function () {
   var debounceHashTime = 400;
   var userInteraction = false;
 
-function zoomend() {
-  if (!startTranslate) return;
-  
-  drag = startTranslate && translate !== startTranslate;
-  zooming = false;
-  filterVisible();
+  function zoomend() {
+    if (!startTranslate) return;
+    
+    drag = startTranslate && translate !== startTranslate;
+    zooming = false;
+    filterVisible();
 
-  if (
-    zoomedToImage &&
-    selectedImage &&
-    !selectedImage.big &&
-    state.lastZoomed != selectedImage.id &&
-    !state.zoomingToImage
-  ) {
-    loadBigImage(selectedImage, "zoom");
-  }
-
-  if (lastSourceEvent) {
-    if (debounceHash) clearTimeout(debounceHash);
-    debounceHash = setTimeout(function () {
-      if (zooming || state.zoomingToImage) return; // FIX: Während Animation abbrechen
-      
-      var hash = window.location.hash.slice(1);
-      var params = new URLSearchParams(hash);
-
-      const idsInViewport = canvas.getView();
-      if (idsInViewport.length > 0) {
-        params.set("ids", idsInViewport.join(","));
-      } else if (zoomedToImage && selectedImage) {
-        params.set("ids", selectedImage.id); // FIX: Fallback
-      } else {
-        params.delete("ids");
-      }
-      
-      userInteraction = true; // FIX: Sicherstellen, dass onhashchange weiß, dass es lokal ausgelöst wurde
-      window.location.hash = params.toString().replaceAll("%2C", ",");
-    }, debounceHashTime);
-  }
-}
-
-canvas.onhashchange = function () {
-  if (state.zoomingToImage) return; // FIX: Animationen nicht unterbrechen
-
-  var hash = window.location.hash.slice(1);
-  var params = new URLSearchParams(hash);
-
-  if (params.has("ids") && !userInteraction) {
-    var ids = params.get("ids").split(",");
     if (
-      params.has("mode") && params.get("mode") !== state.mode.title ||
-      params.has("filter") && params.get("filter") !== tags.getFilterWords().join(",") ||
-      params.get("search") !== tags.getSearchTerm()
+      zoomedToImage &&
+      selectedImage &&
+      !selectedImage.big &&
+      state.lastZoomed != selectedImage.id &&
+      !state.zoomingToImage
     ) {
-      zoomedToImage = false;
-      state.lastZoomed = 0;
-      showAllImages();
-      clearBigImages();
-      setTimeout(function () {
-        canvas.setView(ids);
-      }, hashDelay);
-    } else {
-      canvas.setView(ids);
+      loadBigImage(selectedImage, "zoom");
+    }
+
+    if (lastSourceEvent) {
+      if (debounceHash) clearTimeout(debounceHash);
+      debounceHash = setTimeout(function () {
+        if (zooming || state.zoomingToImage) return;
+        
+        var hash = window.location.hash.slice(1);
+        var params = new URLSearchParams(hash);
+
+        const idsInViewport = canvas.getView();
+        if (idsInViewport.length > 0) {
+          params.set("ids", idsInViewport.join(","));
+        } else if (zoomedToImage && selectedImage) {
+          params.set("ids", selectedImage.id);
+        } else {
+          params.delete("ids");
+        }
+        
+        userInteraction = true;
+        window.location.hash = params.toString().replaceAll("%2C", ",");
+      }, debounceHashTime);
     }
   }
 
-  // FIX: resetZoom nur ausführen, wenn der Hash leer ist UND keine direkte Interaktion stattfand
-  if (hash === "" && !userInteraction) {
-    canvas.removeAllCustomGraphics();
-    canvas.resetZoom(function () {
-      tags.reset();
-      utils.setMode();
-      search.reset();
-    });
-    return;
-  }
+  canvas.onhashchange = function () {
+    if (state.zoomingToImage) return;
+
+    var hash = window.location.hash.slice(1);
+    var params = new URLSearchParams(hash);
+
+    if (params.has("ids") && !userInteraction) {
+      var ids = params.get("ids").split(",");
+      if (
+        params.has("mode") && params.get("mode") !== state.mode.title ||
+        params.has("filter") && params.get("filter") !== tags.getFilterWords().join(",") ||
+        params.get("search") !== tags.getSearchTerm()
+      ) {
+        zoomedToImage = false;
+        state.lastZoomed = 0;
+        selectedImage = null;
+        showAllImages();
+        clearBigImages();
+        setTimeout(function () {
+          canvas.setView(ids);
+        }, hashDelay);
+      } else {
+        canvas.setView(ids);
+      }
+      return;
+    }
+
+    if (!params.has("ids") && (zoomedToImage || state.lastZoomed || selectedImage)) {
+      zoomedToImage = false;
+      selectedImage = null;
+      state.lastZoomed = 0;
+      clearBigImages();
+      showAllImages();
+      detailContainer.classed("hide", true);
+      canvas.resetZoom();
+    }
+
+    if (hash === "" && !userInteraction) {
+      canvas.removeAllCustomGraphics();
+      canvas.resetZoom(function () {
+        tags.reset();
+        utils.setMode();
+        search.reset();
+      });
+      return;
+    }
 
     if (params.has("filter")) {
       var filter = params.get("filter").split(",");
@@ -1504,7 +1519,14 @@ canvas.onhashchange = function () {
 
     d3.select(".sidebar").classed("sneak", true);
     d3.select(".tagcloud").classed("hide", false);
+
+    zoomedToImage = false;
+    selectedImage = null;
+    state.lastZoomed = 0;
+
+    showAllImages();
     if (typeof clearBigImages === "function") clearBigImages();
+    detailContainer.classed("hide", true);
 
     var startS = scale;
     var startT = [translate[0], translate[1]];
@@ -1544,6 +1566,8 @@ canvas.onhashchange = function () {
       .each("end", function () {
         zoomedToImage = false;
         selectedImage = null;
+        state.lastZoomed = 0;
+        showAllImages();
         state.zoomingToImage = false;
         vizContainer.style("pointer-events", "auto");
         if (callback && scale < zoomBarrier) callback();
@@ -1739,10 +1763,13 @@ canvas.onhashchange = function () {
 
   function clearBigImages() {
     while (stage5.children[0]) {
-      stage5.children[0]._data.big = false;
+      if (stage5.children[0]._data) {
+        stage5.children[0]._data.big = false;
+      }
       stage5.removeChild(stage5.children[0]);
-      sleep = false;
     }
+    showAllImages();
+    sleep = false;
   }
 
   function loadImages() {
