@@ -1054,14 +1054,25 @@ textarea:focus, input:focus{
   }
 }
 
-body:has(.detail:not(.hide):not(.sneak)) .overlay text {
+/* 1. Canvas-Unterschriften standardmäßig ODER bei geschlossener Sidebar IMMER ausblenden */
+.overlay text,
+body:has(.detail.hide) .overlay text,
+body:has(.detail.sneak) .overlay text {
+  display: none !important;
+}
+
+/* 2. NUR bei GEÖFFNETER Sidebar NUR den Text des AKTIVEN Bildes anzeigen */
+body:has(.detail:not(.hide):not(.sneak)) .overlay text[opacity="1"],
+body:has(.detail:not(.hide):not(.sneak)) .overlay text[style*="opacity: 1"],
+body:has(.detail:not(.hide):not(.sneak)) .overlay text.active,
+body:has(.detail:not(.hide):not(.sneak)) .overlay g.active text {
   display: block !important;
-  font-size: 13px !important;
+  font-size: 12px !important;
   font-weight: bold;
   fill: #ffffff !important;
 }
 
-/* Tooltip beim Drüberfahren mit der Maus (falls gewünscht, sonst auch ausblendbar) */
+/* Tooltip beim Drüberfahren mit der Maus (Hover) */
 .stooltip text {
   inline-size: 160px !important;
   white-space: pre-wrap !important;
