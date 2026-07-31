@@ -315,7 +315,14 @@ function Canvas() {
     }
   };
 
-  canvas.getView = function () {
+canvas.getView = function () {
+  // FIX: Wenn auf ein Bild gezoomt ist, immer direkt die ID des Bildes liefern
+  if (zoomedToImage && selectedImage && selectedImage.id) {
+    return [selectedImage.id];
+  }
+
+    var visibleItems = [];
+    var invScale = 1 / scale;
     var visibleItems = [];
     var invScale = 1 / scale;
     var viewLeft = (-translate[0] * invScale);
