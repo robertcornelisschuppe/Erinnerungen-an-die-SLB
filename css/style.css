@@ -1072,12 +1072,16 @@ body:has(.detail:not(.hide):not(.sneak)) .overlay g.active text {
   fill: #ffffff !important;
 }
 
-/* Tooltip beim Drüberfahren mit der Maus (Hover) */
 .stooltip text {
   inline-size: 160px !important;
   white-space: pre-wrap !important;
 }
 
-.video-container {
-  margin-left: 100px;
+.detail .slidebutton {
+  z-index: 999 !important; /* Bringt den Pfeil in den Vordergrund */
+  left: 10px !important;    /* Verschiebt den Pfeil weiter an den linken Rand */
+}
+
+.detail .media-player-container {
+  margin-left: 0px !important; 
 }
