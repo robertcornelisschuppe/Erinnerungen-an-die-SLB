@@ -1077,3 +1077,7 @@ body:has(.detail:not(.hide):not(.sneak)) .overlay g.active text {
   inline-size: 160px !important;
   white-space: pre-wrap !important;
 }
+
+.video-container {
+  margin-left: 40px; /* Schafft links Platz für den Button */
+}
