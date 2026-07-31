@@ -1222,76 +1222,86 @@ canvas.resize = function () {
   var lastSourceEvent = null;
   var isInIframe = window.self !== window.top;
 
-  function zoomed() {
-    lastSourceEvent = d3.event.sourceEvent;
-    translate = d3.event.translate;
-    scale = d3.event.scale;
-    if (!startTranslate) startTranslate = translate;
-    drag = startTranslate && translate !== startTranslate;
+function zoomed() {
+  lastSourceEvent = d3.event.sourceEvent;
+  translate = d3.event.translate;
+  scale = d3.event.scale;
+  if (!startTranslate) startTranslate = translate;
+  drag = startTranslate && translate !== startTranslate;
 
-    var x1 = (-1 * translate[0]) / scale;
-    var x2 = x1 + widthOuter / scale;
+  var x1 = (-1 * translate[0]) / scale;
+  var x2 = x1 + widthOuter / scale;
 
-    if (d3.event.sourceEvent != null) {
-      var sidebarOffset = Math.min(480, widthOuter * 0.4);
+  if (d3.event.sourceEvent != null) {
+    var sidebarOffset = Math.min(480, widthOuter * 0.4);
 
-      if (x1 < 0) {
-        translate[0] = 0;
-      } else if (x2 > widthOuter + (sidebarOffset / scale)) {
-        translate[0] = (widthOuter * scale - widthOuter + sidebarOffset) * -1;
-      }
-
-      zoom.translate([translate[0], translate[1]]);
-      x1 = (-1 * translate[0]) / scale;
-      x2 = x1 + width / scale;
+    if (x1 < 0) {
+      translate[0] = 0;
+    } else if (x2 > widthOuter + (sidebarOffset / scale)) {
+      translate[0] = (widthOuter * scale - widthOuter + sidebarOffset) * -1;
     }
 
-    if (
-      zoomedToImageScale != 0 &&
-      scale > zoomedToImageScale * 0.9 &&
-      !zoomedToImage &&
-      selectedImage &&
-      selectedImage.type == "image"
-    ) {
-      zoomedToImage = true;
-      zoom.center(null);
-      zoomedToImageScale = scale;
-      hideTheRest(selectedImage);
-      showDetail(selectedImage);
-    }
-
-    if (zoomedToImage && zoomedToImageScale * 0.8 > scale) {
-      zoomedToImage = false;
-      state.lastZoomed = 0;
-      selectedImage = null;
-      showAllImages();
-      clearBigImages();
-      detailContainer.classed("hide", true);
-    }
-
-    timeline.update(x1, x2, scale, translate, scale1);
-
-    if (scale > zoomBarrier && !zoomBarrierState) {
-      zoomBarrierState = true;
-      d3.select(".tagcloud, .crossfilter").classed("hide", true);
-      d3.select(".searchbar").classed("hide", true);
-      d3.select(".infobar").classed("sneak", true);
-    }
-    if (scale < zoomBarrier && zoomBarrierState) {
-      zoomBarrierState = false;
-      d3.select(".tagcloud, .crossfilter").classed("hide", false);
-      d3.select(".vorbesitzerinOuter").classed("hide", false);
-      d3.select(".searchbar").classed("hide", false);
-    }
-
-    stage2.scale.x = d3.event.scale;
-    stage2.scale.y = d3.event.scale;
-    stage2.x = d3.event.translate[0];
-    stage2.y = d3.event.translate[1];
-
-    sleep = false;
+    zoom.translate([translate[0], translate[1]]);
+    x1 = (-1 * translate[0]) / scale;
+    x2 = x1 + width / scale;
   }
 
+  // 1. Synchronisation der Zeitleiste
+  if (typeof timeline !== "undefined" && typeof timeline.update === "function") {
+    timeline.update(x1, x2, scale, translate, scale1);
+  }
+
+  // 2. Synchronisation der Schlagwörter (Tagcloud)
+  if (typeof tags !== "undefined" && typeof tags.update === "function") {
+    tags.update(x1, x2, scale, translate, scale1);
+  }
+
+  if (
+    zoomedToImageScale != 0 &&
+    scale > zoomedToImageScale * 0.9 &&
+    !zoomedToImage &&
+    selectedImage &&
+    selectedImage.type == "image"
+  ) {
+    zoomedToImage = true;
+    zoom.center(null);
+    zoomedToImageScale = scale;
+    hideTheRest(selectedImage);
+    showDetail(selectedImage);
+  }
+
+  if (zoomedToImage && zoomedToImageScale * 0.8 > scale) {
+    zoomedToImage = false;
+    state.lastZoomed = 0;
+    selectedImage = null;
+    showAllImages();
+    clearBigImages();
+    detailContainer.classed("hide", true);
+  }
+
+  // (Der doppelte timeline.update-Aufruf wurde hier entfernt)
+
+  if (scale > zoomBarrier && !zoomBarrierState) {
+    zoomBarrierState = true;
+    d3.select(".tagcloud, .crossfilter").classed("hide", true);
+    d3.select(".searchbar").classed("hide", true);
+    d3.select(".infobar").classed("sneak", true);
+  }
+  if (scale < zoomBarrier && zoomBarrierState) {
+    zoomBarrierState = false;
+    d3.select(".tagcloud, .crossfilter").classed("hide", false);
+    d3.select(".vorbesitzerinOuter").classed("hide", false);
+    d3.select(".searchbar").classed("hide", false);
+  }
+
+  stage2.scale.x = d3.event.scale;
+  stage2.scale.y = d3.event.scale;
+  stage2.x = d3.event.translate[0];
+  stage2.y = d3.event.translate[1];
+
+  sleep = false;
+}
+  
   function zoomstart(d) {
     zooming = true;
     startTranslate = false;
