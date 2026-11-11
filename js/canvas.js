@@ -1036,6 +1036,7 @@ canvas.resize = function () {
     loadImages();
     if (sleep) return;
     sleep = imageAnimation();
+    if (canvas.updateCaptionPosition) canvas.updateCaptionPosition();
     renderer.render(stage);
   }
 
@@ -1753,6 +1754,7 @@ function loadBigImage(d) {
       d3.select("#caption-overlay")
         .text(d._description)
         .classed("hide", false);
+      canvas.updateCaptionPosition();
     } else {
       d3.select("#caption-overlay")
         .text("")
@@ -1785,6 +1787,67 @@ function loadBigImage(d) {
       }
     }
   }
+
+  canvas.updateCaptionPosition = function () {
+    var overlay = d3.select("#caption-overlay");
+    if (overlay.classed("hide") || !selectedImage || !zoomedToImage) return;
+
+    // 1. Verbleibende Breite berechnen (Bildschirmbreite abzüglich Sidebar-Breite)
+    var detailNode = d3.select(".detail").node();
+    var sidebarWidth = 0;
+    if (detailNode && !detailContainer.classed("hide") && !detailContainer.classed("sneak")) {
+      sidebarWidth = detailNode.getBoundingClientRect().width;
+    }
+    var availWidth = widthOuter - sidebarWidth;
+    if (availWidth <= 0) availWidth = widthOuter;
+
+    // 2. Untere Kante des maximierten Bildes auf dem Bildschirm berechnen
+    var d = selectedImage;
+    var texW = 1, texH = 1;
+    if (d.sprite2 && d.sprite2.texture && d.sprite2.texture.valid && d.sprite2.texture.height > 0) {
+      texW = d.sprite2.texture.width;
+      texH = d.sprite2.texture.height;
+    } else if (d.aspect_ratio) {
+      var parts = d.aspect_ratio.split(":");
+      if (parts.length === 2 && parseFloat(parts[1]) > 0) {
+        texW = parseFloat(parts[0]) || 1;
+        texH = parseFloat(parts[1]) || 1;
+      }
+    }
+
+    var aspect = texW / texH;
+    var baseSize = rangeBandImage * (d.scaleFactor || 1);
+    var imgStage2Height = aspect >= 1 ? baseSize / aspect : baseSize;
+    var imgScreenHeight = imgStage2Height * scale;
+
+    var imgCenterX = (d.x + rangeBandImage / 2) * scale + translate[0];
+    var imgCenterY = (height + d.y + rangeBandImage / 2) * scale + translate[1];
+    var imageBottomY = imgCenterY + (imgScreenHeight / 2);
+
+    // 3. Sicherheitsabstände & Begrenzung berechnen
+    var sideMargin = 20;
+    var overlayNode = overlay.node();
+    var captionWidth = overlayNode ? overlayNode.offsetWidth : 200;
+    var captionHeight = overlayNode ? overlayNode.offsetHeight : 40;
+    var halfWidth = captionWidth / 2;
+
+    var maxCaptionWidth = Math.max(120, availWidth - (sideMargin * 2));
+
+    // Zentrieren unter dem Bild, aber strikt im Sichtbereich [sideMargin, availWidth - sideMargin] halten
+    var minX = sideMargin + halfWidth;
+    var maxX = availWidth - sideMargin - halfWidth;
+    var clampX = Math.max(minX, Math.min(maxX, imgCenterX));
+
+    // Vertikal unter dem Bild positionieren, maximal bis zum unteren Bildschirmrand
+    var targetTop = imageBottomY + 14;
+    var maxTop = height - captionHeight - 20;
+    var finalTop = Math.max(20, Math.min(targetTop, maxTop));
+
+    overlay
+      .style("max-width", maxCaptionWidth + "px")
+      .style("left", clampX + "px")
+      .style("top", finalTop + "px");
+  };
 
   return canvas;
 }
