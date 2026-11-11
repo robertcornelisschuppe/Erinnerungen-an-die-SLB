@@ -1761,10 +1761,11 @@ function zoomed() {
         align: 'center'
       });
 
-      var descText = new PIXI.Text(d._description, style);
-      descText.anchor.x = 0.5;
-      descText.anchor.y = 0;
-      descText.position.x = d.x * scale3 + imageSize3 / 2;
+    if (d._description) {
+      d3.select("#caption-overlay")
+        .text("")
+        .classed("hide", true);
+    }
 
       var updateTextPosition = function() {
         var actualHeight = sprite.height || imageSize3;
