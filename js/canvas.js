@@ -1541,9 +1541,10 @@ function zoomed() {
     quadtree = Quadtree(data);
   };
 
-  canvas.resetZoom = function (callback) {
+canvas.resetZoom = function (callback) {
     var duration = scale > 1 ? 800 : 100;
     canvas.clearMedia();
+    d3.select("#caption-overlay").classed("hide", true);
 
     extent = d3.extent(data, function (d) { return d.y; });
     var targetY = -bottomPadding;
@@ -1685,90 +1686,82 @@ function zoomed() {
   }
 
   function loadBigImage(d) {
-    if (!config.loader.textures.big) {
-      loadMiddleImage(d);
-      return;
-    }
-
-    state.lastZoomed = d.id;
-    var page = d.page ? "_" + d.page : "";
-    var url = "";
-    if (config.loader.textures.big.csv) {
-      url = d[config.loader.textures.big.csv];
-    } else {
-      url = config.loader.textures.big.url + "/" + d.id + page + ".jpg";
-    }
-
-    var texture = new PIXI.Texture.from(url);
-    var sprite = new PIXI.Sprite(texture);
-
-    var updateSize = function (t) {
-      var size = Math.max(texture.width, texture.height);
-      sprite.scale.x = sprite.scale.y = (imageSize3 / size) * d.scaleFactor;
-      sleep = false;
-      if (t.valid) {
-        d.alpha = 0;
-        d.alpha2 = 0;
+      if (!config.loader.textures.big) {
+        loadMiddleImage(d);
+        return;
       }
-      if (zoomedToImage && selectedImage && selectedImage.id === d.id && !state.zoomingToImage) {
-        zoomToImage(d, 300);
-      }
-    };
-
-    sprite.on("added", updateSize);
-    texture.once("update", updateSize);
-
-    if (d.imagenum) {
-      sprite.on("mousemove", function (s) {
-        var pos = s.data.getLocalPosition(s.currentTarget);
-        s.currentTarget.cursor = pos.x > 0 ? "e-resize" : "w-resize";
-      });
-      sprite.on("click", function (s) {
-        if (drag) return;
-        s.stopPropagation();
-        spriteClick = true;
-        var pos = s.data.getLocalPosition(s.currentTarget);
-        var dir = pos.x > 0 ? 1 : -1;
-        var page = d.page + dir;
-        var nextPage = page;
-        if (page > d.imagenum - 1) nextPage = 0;
-        if (page < 0) nextPage = d.imagenum - 1;
-
-        canvas.changePage(d.id, nextPage);
-      });
-      sprite.interactive = true;
-    }
-
-    sprite.anchor.x = 0.5;
-    sprite.anchor.y = 0.5;
-    sprite.position.x = d.x * scale3 + imageSize3 / 2;
-    sprite.position.y = d.y * scale3 + imageSize3 / 2;
-    sprite._data = d;
-    d.big = true;
-    stage5.addChild(sprite);
-
-    if (d._description) {
-      var highResMultiplier = 4;
-      var targetScreenFontSize = 32;
-      var wrapWidthOnScreen = width * 0.8;
-
-      var style = new PIXI.TextStyle({
-        fontFamily: 'Lato, Arial, sans-serif',
-        fontSize: targetScreenFontSize * highResMultiplier, 
-        fill: '#000000',
-        wordWrap: true,
-        wordWrapWidth: wrapWidthOnScreen * highResMultiplier,
-        align: 'center'
-      });
   
-    if (d._description) {
-          d3.select("#caption-overlay")
-            .text(d._description)
-            .classed("hide", false);
+      state.lastZoomed = d.id;
+      var page = d.page ? "_" + d.page : "";
+      var url = "";
+      if (config.loader.textures.big.csv) {
+        url = d[config.loader.textures.big.csv];
+      } else {
+        url = config.loader.textures.big.url + "/" + d.id + page + ".jpg";
+      }
+  
+      var texture = new PIXI.Texture.from(url);
+      var sprite = new PIXI.Sprite(texture);
+  
+      var updateSize = function (t) {
+        var size = Math.max(texture.width, texture.height);
+        sprite.scale.x = sprite.scale.y = (imageSize3 / size) * d.scaleFactor;
+        sleep = false;
+        if (t.valid) {
+          d.alpha = 0;
+          d.alpha2 = 0;
         }
-
-    d3.select("#caption-overlay").classed("hide", true);
-
+        if (zoomedToImage && selectedImage && selectedImage.id === d.id && !state.zoomingToImage) {
+          zoomToImage(d, 300);
+        }
+      };
+  
+      sprite.on("added", updateSize);
+      texture.once("update", updateSize);
+  
+      if (d.imagenum) {
+        sprite.on("mousemove", function (s) {
+          var pos = s.data.getLocalPosition(s.currentTarget);
+          s.currentTarget.cursor = pos.x > 0 ? "e-resize" : "w-resize";
+        });
+        sprite.on("click", function (s) {
+          if (drag) return;
+          s.stopPropagation();
+          spriteClick = true;
+          var pos = s.data.getLocalPosition(s.currentTarget);
+          var dir = pos.x > 0 ? 1 : -1;
+          var page = d.page + dir;
+          var nextPage = page;
+          if (page > d.imagenum - 1) nextPage = 0;
+          if (page < 0) nextPage = d.imagenum - 1;
+  
+          canvas.changePage(d.id, nextPage);
+        });
+        sprite.interactive = true;
+      }
+  
+      sprite.anchor.x = 0.5;
+      sprite.anchor.y = 0.5;
+      sprite.position.x = d.x * scale3 + imageSize3 / 2;
+      sprite.position.y = d.y * scale3 + imageSize3 / 2;
+      sprite._data = d;
+      d.big = true;
+      stage5.addChild(sprite);
+  
+      // HTML-Caption Overlay setzen
+      if (d._description) {
+        d3.select("#caption-overlay")
+          .text(d._description)
+          .classed("hide", false);
+      } else {
+        d3.select("#caption-overlay")
+          .text("")
+          .classed("hide", true);
+      }
+  
+      sleep = false;
+    }
+  
       var updateTextPosition = function() {
         var actualHeight = sprite.height || imageSize3;
         var actualWidth = sprite.width || imageSize3;
@@ -1802,9 +1795,10 @@ function zoomed() {
       }
       stage5.removeChild(stage5.children[0]);
     }
-    showAllImages();
-    sleep = false;
-  }
+    d3.select("#caption-overlay").classed("hide", true);
+        showAllImages();
+        sleep = false;
+      }
 
   function loadImages() {
     if (zooming) return;
