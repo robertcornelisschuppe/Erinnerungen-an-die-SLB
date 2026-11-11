@@ -1760,12 +1760,14 @@ function zoomed() {
         wordWrapWidth: wrapWidthOnScreen * highResMultiplier,
         align: 'center'
       });
-
+  
     if (d._description) {
-      d3.select("#caption-overlay")
-        .text("")
-        .classed("hide", true);
-    }
+          d3.select("#caption-overlay")
+            .text(d._description)
+            .classed("hide", false);
+        }
+
+    d3.select("#caption-overlay").classed("hide", true);
 
       var updateTextPosition = function() {
         var actualHeight = sprite.height || imageSize3;
