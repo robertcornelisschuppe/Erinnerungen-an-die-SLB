@@ -111,7 +111,7 @@ function Timeline() {
         return d.titel;
       });
 
-    var m = e.append("div").classed("middle", true);
+var m = e.append("div").classed("middle", true);
 
     m.append("div")
       .classed("title", true)
@@ -119,11 +119,14 @@ function Timeline() {
         return d.titel;
       });
 
-    m.append("div")
+    m.filter(function (d) {
+        return d.text && d.text.trim() !== "";
+      })
+      .append("div")
       .classed("text", true)
       .text(function (d) {
-        return d.text + ".";
-      }); //…
+        return d.text.trim();
+      });
 
     var l = e.append("div").classed("large", true);
 
@@ -133,12 +136,18 @@ function Timeline() {
         return d.titel;
       });
 
-    l.append("div")
+    l.filter(function (d) {
+        return (d.text && d.text.trim() !== "") || (d.extra && d.extra.trim() !== "");
+      })
+      .append("div")
       .classed("text", true)
       .html(function (d) {
-        return d.text + ".<br><br>" + d.extra;
+        var parts = [];
+        if (d.text && d.text.trim() !== "") parts.push(d.text.trim());
+        if (d.extra && d.extra.trim() !== "") parts.push(d.extra.trim());
+        return parts.join("<br><br>");
       });
-
+    
     select
       .style("transform", function (d) {
         return "translate3d(" + parseInt(d.pos) + "px,0px,0px)";
