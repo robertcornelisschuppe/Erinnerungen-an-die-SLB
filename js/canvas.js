@@ -382,11 +382,10 @@ function Canvas() {
     if (items.length == 1) {
       var d = items[0];
       selectedImage = d;
+      state.zoomingToImage = true;
+      d3.select("#caption-overlay").classed("hide", true);
       
       if (typeof zoomToImage === "function") {
-        showDetail(d);
-        loadBigImage(d, "click");
-        hideTheRest(d);
         zoomToImage(d, duration);
         return;
       }
@@ -1162,13 +1161,23 @@ canvas.resize = function () {
         vizContainer.style("pointer-events", "auto");
         utils.updateHash("ids", d.id, ["translate", "scale"]);
 
-        // Untertitel erst jetzt einblenden und exakt positionieren
-        if (d._description) {
-          d3.select("#caption-overlay")
-            .text(d._description)
-            .classed("hide", false);
-          if (canvas.updateCaptionPosition) canvas.updateCaptionPosition();
-        }
+    var overlay = d3.select("#caption-overlay");
+    if (d._description && d._description.toString().trim() !== "") {
+      overlay.text(d._description);
+      if (zoomedToImage && !state.zoomingToImage) {
+        overlay
+          .style("visibility", "hidden")
+          .classed("hide", false);
+        if (canvas.updateCaptionPosition) canvas.updateCaptionPosition();
+        overlay.style("visibility", "visible");
+      } else {
+        overlay.classed("hide", true);
+      }
+    } else {
+      overlay
+        .text("")
+        .classed("hide", true);
+    }
       });
   }
   canvas.zoomToImage = zoomToImage;
@@ -1268,7 +1277,7 @@ function zoomed() {
     tags.update(x1, x2, scale, translate, scale1);
   }
 
-  if (
+if (
     zoomedToImageScale != 0 &&
     scale > zoomedToImageScale * 0.9 &&
     !zoomedToImage &&
@@ -1280,18 +1289,17 @@ function zoomed() {
     zoomedToImageScale = scale;
     hideTheRest(selectedImage);
     showDetail(selectedImage);
-  }
 
-  if (zoomedToImage && zoomedToImageScale * 0.8 > scale) {
-    zoomedToImage = false;
-    state.lastZoomed = 0;
-    selectedImage = null;
-    showAllImages();
-    clearBigImages();
-    detailContainer.classed("hide", true);
+    if (selectedImage._description && selectedImage._description.toString().trim() !== "") {
+      var overlay = d3.select("#caption-overlay");
+      overlay
+        .style("visibility", "hidden")
+        .text(selectedImage._description)
+        .classed("hide", false);
+      if (canvas.updateCaptionPosition) canvas.updateCaptionPosition();
+      overlay.style("visibility", "visible");
+    }
   }
-
-  // (Der doppelte timeline.update-Aufruf wurde hier entfernt)
 
   if (scale > zoomBarrier && !zoomBarrierState) {
     zoomBarrierState = true;
@@ -1799,9 +1807,9 @@ function loadBigImage(d) {
     }
   }
 
-  canvas.updateCaptionPosition = function () {
+canvas.updateCaptionPosition = function () {
     var overlay = d3.select("#caption-overlay");
-    if (overlay.classed("hide") || !selectedImage || !zoomedToImage) return;
+    if (overlay.classed("hide") || !selectedImage || !zoomedToImage || state.zoomingToImage) return;
 
     // 1. Verbleibende Breite berechnen (Bildschirmbreite abzüglich Sidebar-Breite)
     var detailNode = d3.select(".detail").node();
@@ -1837,25 +1845,27 @@ function loadBigImage(d) {
 
     // 3. Sicherheitsabstände & Begrenzung berechnen
     var sideMargin = 20;
+    var maxCaptionWidth = Math.max(120, availWidth - (sideMargin * 2));
+
+    overlay
+      .style("max-width", maxCaptionWidth + "px")
+      .style("left", "0px")
+      .style("top", "0px");
+
     var overlayNode = overlay.node();
     var captionWidth = overlayNode ? overlayNode.offsetWidth : 200;
     var captionHeight = overlayNode ? overlayNode.offsetHeight : 40;
     var halfWidth = captionWidth / 2;
 
-    var maxCaptionWidth = Math.max(120, availWidth - (sideMargin * 2));
-
-    // Zentrieren unter dem Bild, aber strikt im Sichtbereich [sideMargin, availWidth - sideMargin] halten
     var minX = sideMargin + halfWidth;
     var maxX = availWidth - sideMargin - halfWidth;
     var clampX = Math.max(minX, Math.min(maxX, imgCenterX));
 
-    // Vertikal unter dem Bild positionieren, maximal bis zum unteren Bildschirmrand
     var targetTop = imageBottomY + 14;
     var maxTop = height - captionHeight - 20;
     var finalTop = Math.max(20, Math.min(targetTop, maxTop));
 
     overlay
-      .style("max-width", maxCaptionWidth + "px")
       .style("left", clampX + "px")
       .style("top", finalTop + "px");
   };
