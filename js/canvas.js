@@ -269,7 +269,7 @@ function Canvas() {
 
     var iframeHtml = "";
 
-    if (link.includes("youtube.com") || link.includes("youtu.be")) {
+  if (link.includes("youtube.com") || link.includes("youtu.be")) {
       var videoId = "";
       if (link.includes("youtu.be/")) {
         videoId = link.split("youtu.be/")[1].split(/[?&]/)[0];
@@ -277,15 +277,12 @@ function Canvas() {
         videoId = link.split("v=")[1].split(/[?&]/)[0];
       }
       if (videoId) {
-        var originParam = window.location.origin && window.location.origin !== "null"
-          ? "&origin=" + encodeURIComponent(window.location.origin)
-          : "";
         iframeHtml =
           '<iframe class="media-iframe" ' +
-          'src="https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=1&playsinline=1&rel=0&controls=1' + originParam + '" ' +
+          'src="https://www.youtube.com/embed/' + videoId + '?autoplay=1&mute=1&rel=0&controls=1" ' +
           'frameborder="0" ' +
           'referrerpolicy="strict-origin-when-cross-origin" ' +
-          'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" ' +
+          'allow="autoplay; encrypted-media; picture-in-picture" ' +
           'allowfullscreen></iframe>';
       }
     } else if (link.includes("soundcloud.com/player/")) {
