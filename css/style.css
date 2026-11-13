@@ -349,14 +349,11 @@ svg {
 }
 
 .timeline .entry {
-  /* transform: scale(0.5); */
-  /* overflow: hidden; */
-  /* font-size: 13px; */
   margin-bottom: 3%;
-  width: 92%;
+  width: 100%;
   position: relative;
   background: #454545;
-  float: left;
+  float: none;
   padding: 4%;
 }
 
@@ -379,10 +376,11 @@ svg {
 
 .timeline .year {
   transition: padding 0.2s;
+  display: block;
+  width: 100%;
   text-align: center;
   color: rgb(247, 239, 205);
-  padding: 8%;
-  /* border-bottom: 1px solid #eee; */
+  padding: 8% 0;
 }
 
 /*.none .entries {
