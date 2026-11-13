@@ -1162,24 +1162,6 @@ canvas.resize = function () {
         utils.updateHash("ids", d.id, ["translate", "scale"]);
         showCaption(d);
       });
-    var overlay = d3.select("#caption-overlay");
-    if (d._description && d._description.toString().trim() !== "") {
-      overlay.text(d._description);
-      if (zoomedToImage && !state.zoomingToImage) {
-        overlay
-          .style("visibility", "hidden")
-          .classed("hide", false);
-        if (canvas.updateCaptionPosition) canvas.updateCaptionPosition();
-        overlay.style("visibility", "visible");
-      } else {
-        overlay.classed("hide", true);
-      }
-    } else {
-      overlay
-        .text("")
-        .classed("hide", true);
-    }
-      });
   }
   canvas.zoomToImage = zoomToImage;
 
@@ -1300,7 +1282,6 @@ if (
     showAllImages();
     clearBigImages();
     detailContainer.classed("hide", true);
-  }
   }
 
   if (scale > zoomBarrier && !zoomBarrierState) {
