@@ -1,17 +1,20 @@
-# Van Gogh
+# Bibliothekserinnerungen
 
-The [Van Gogh Museum](http://vangoghmuseum.nl/en/) in Amsterdam owns the world's largest collection of artworks by Vincent van Gogh. Among the collection are world famous paintings like "Sunflowers", "Almond Blossom" and "The Potato Eaters". Vincent lived and worked in 14 different cities in the Netherlands, Belgium and France, where among the many famous paintings and self-portraits he also created drawings of the people, animals and landscapes of the region to improve his artistic skills.
+Die SLUB Dresden und ihre Vorgängerinstitutionen, die Sächsische Landesbibliothek sowie die Bibliothek der TU Dresden, haben eine lange und bewegte Geschichte. In diesem Projekt berichten ehemalige Mitarbeitende von ihrer Arbeit in diesen Bibliotheken. Dabei liegt der Fokus auf der DDR- und Wendezeit. Wie politische Gegebenheiten die Arbeitswelt beeinflussten spielt dabei genauso eine Rolle wie die sich wandelnden Formen von Zusammenarbeit. Auf diese Weise dokumentiert <i>Bibliothekserinnerungen</i> nicht nur die Entstehung und Entwicklung der SLUB Dresden, sondern trägt auch zu einer Geschichtsschreibung von unten bei.
 
 ![tags](img/infobar_tags.svg)
 
-The keywords represent prominent topics in and techniques of the artworks. Click on the keywords in order to thematically narrow down the selection of paintings and drawings.
+Die Schlagwörter am oberen Bildrand können angeklickt werden um die vorhandenen Inhalte thematisch zu filtern.
 
 ![time](img/infobar_time.svg)
 
-The artworks are positioned along their year of origin. Below the year you can find further biographical information.
+Die Inhalte sind nach Dekaden geordnet. Am unteren Bildrand sind diese vermerkt.
 
 ![time](img/infobar_scroll.svg)
 
-You can either zoom with your touchpad or scroll wheel in the areas of the artworks in order to see more details. Klick and drag the background in order to adjust the visible area.
+Nutzen Sie das Touchpad oder das Mausrad, um zu zoomen. Klicken Sie auf einzelne Bilder, um das Bild zu maximieren und den dazugehörigen Interviewausschnitt zu starten.
 
-Background research: Viktoria Brüggemann
+Redaktion: Katrin Nitzschke und Robert C. Schuppe
+Interviews: Stella Philipp, Elena Hansen, Katrin Nitzschke und Robert C. Schuppe
+Technische Umsetzung: Robert C. Schuppe
+Hintergrundrecherche: Katrin Nitzschke
