@@ -1157,6 +1157,7 @@ svg,
   pointer-events: auto; /* Stellt Klickbarkeit der einzelnen Zeitleisten-Einträge wieder her */
 }
 
+#caption-overlay,
 .caption-overlay {
   position: absolute;
   z-index: 500;
@@ -1177,8 +1178,9 @@ svg,
   transition: opacity 0.2s ease;
 }
 
+#caption-overlay.hide,
 .caption-overlay.hide {
   opacity: 0;
-  display: none;
+  display: none !important;
   pointer-events: none;
 }
