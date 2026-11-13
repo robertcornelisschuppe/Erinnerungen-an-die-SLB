@@ -1910,37 +1910,46 @@ function loadBigImage(d) {
     var tagNodes = inner.selectAll(".tag")[0];
     if (!tagNodes || !tagNodes.length) return;
 
-    // Eigene Transition auf dem Wrapper deaktivieren, damit keine Verzögerung entsteht
-    inner
-      .style("position", "relative")
-      .style("transition", "none");
+    // Verzögerte CSS-Transition nur auf dem inneren Wrapper abschalten
+    inner.style("transition", "none");
 
-    var innerRect = innerNode.getBoundingClientRect();
-    var minRelLeft = Infinity;
-    var maxRelRight = -Infinity;
+    // Aktuell angewendetes translateX exakt auslesen (unabhängig von margin-left: 50%)
+    var currentShift = 0;
+    var computedTransform = window.getComputedStyle(innerNode).transform;
+    if (computedTransform && computedTransform !== "none") {
+      if (typeof DOMMatrix !== "undefined") {
+        currentShift = new DOMMatrix(computedTransform).m41 || 0;
+      } else {
+        var match = computedTransform.match(/matrix\(([^)]+)\)/);
+        if (match) {
+          currentShift = parseFloat(match[1].split(",")[4]) || 0;
+        }
+      }
+    }
+
+    var minLeft = Infinity;
+    var maxRight = -Infinity;
 
     tagNodes.forEach(function (el) {
       var rect = el.getBoundingClientRect();
       if (rect.width > 0) {
-        var relLeft = rect.left - innerRect.left;
-        var relRight = rect.right - innerRect.left;
-        if (relLeft < minRelLeft) minRelLeft = relLeft;
-        if (relRight > maxRelRight) maxRelRight = relRight;
+        if (rect.left < minLeft) minLeft = rect.left;
+        if (rect.right > maxRight) maxRight = rect.right;
       }
     });
 
-    if (!isFinite(minRelLeft) || !isFinite(maxRelRight)) return;
+    if (!isFinite(minLeft) || !isFinite(maxRight)) return;
 
-    var viewportWidth = window.innerWidth || widthOuter;
-    var contentWidth = maxRelRight - minRelLeft;
-    var nextShift = Math.round(((viewportWidth - contentWidth) / 2) - minRelLeft);
+    var baseMinLeft = minLeft - currentShift;
+    var baseMaxRight = maxRight - currentShift;
+    var contentWidth = baseMaxRight - baseMinLeft;
+    var viewportWidth = document.documentElement.clientWidth || window.innerWidth || widthOuter;
+    var nextShift = Math.round(((viewportWidth - contentWidth) / 2) - baseMinLeft);
 
-    if (nextShift !== tagcloudShiftX) {
+    if (nextShift !== tagcloudShiftX || Math.abs(nextShift - currentShift) > 0.5) {
       tagcloudShiftX = nextShift;
       if (tagcloudObserver) tagcloudObserver.disconnect();
-      inner
-        .style("transform", "none")
-        .style("left", tagcloudShiftX + "px");
+      inner.style("transform", "translateX(" + tagcloudShiftX + "px)");
       if (tagcloudObserver) {
         tagcloudObserver.observe(innerNode, {
           subtree: true,
@@ -1954,8 +1963,8 @@ function loadBigImage(d) {
       tagcloudObserver = new MutationObserver(function () {
         requestAnimationFrame(canvas.centerTagcloud);
         clearTimeout(tagcloudSettleTimer);
-        // Nach Ende der 300ms CSS-Transition der einzelnen Tags erneut exakt ausrichten
-        tagcloudSettleTimer = setTimeout(canvas.centerTagcloud, 320);
+        // Nach Abschluss der D3-/CSS-Animationen der Tags erneut exakt zentrieren
+        tagcloudSettleTimer = setTimeout(canvas.centerTagcloud, 350);
       });
       tagcloudObserver.observe(innerNode, {
         subtree: true,
