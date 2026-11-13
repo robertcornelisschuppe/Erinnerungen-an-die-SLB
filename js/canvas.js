@@ -277,6 +277,18 @@ function Canvas() {
         videoId = link.split("v=")[1].split(/[?&]/)[0];
       }
       if (videoId) {
+        var originParam = window.location.origin && window.location.origin !== "null"
+          ? "&origin=" + encodeURIComponent(window.location.origin)
+          : "";
+        iframeHtml =
+          '<iframe class="media-iframe" ' +
+          'src="https://www.youtube.com/embed/' + videoId + '?playsinline=1&rel=0&controls=1' + originParam + '" ' +
+          'frameborder="0" ' +
+          'referrerpolicy="strict-origin-when-cross-origin" ' +
+          'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" ' +
+          'allowfullscreen></iframe>';
+      }
+      if (videoId) {
         iframeHtml = '<iframe class="media-iframe" src="https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0&showinfo=0&controls=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
       }
     } else if (link.includes("soundcloud.com/player/")) {
