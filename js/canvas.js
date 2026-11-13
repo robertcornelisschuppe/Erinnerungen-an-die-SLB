@@ -1156,21 +1156,32 @@ canvas.resize = function () {
           sleep = false;
         };
       })
-  	  .each("end", function () {
+      .each("end", function () {
         zoomedToImage = true;
         selectedImage = d;
         hideTheRest(d);
         state.zoomingToImage = false;
         vizContainer.style("pointer-events", "auto");
+        userInteraction = true;
         utils.updateHash("ids", d.id, ["translate", "scale"]);
         showCaption(d);
       });
   }
   canvas.zoomToImage = zoomToImage;
 
-  function showDetail(d) {
-    detailContainer.select(".outer").node().scrollTop = 0;
+function showDetail(d) {
+    var isSameOpenItem =
+      detailVue.id === d.id &&
+      detailVue.page === d.page &&
+      !detailContainer.classed("hide");
+
     detailContainer.classed("hide", false).classed("sneak", utils.isMobile() || isInIframe);
+
+    if (isSameOpenItem) {
+      return;
+    }
+
+    detailContainer.select(".outer").node().scrollTop = 0;
 
     var detailData = {};
     config.detail.structure.forEach(function (field) {
@@ -1711,9 +1722,6 @@ function loadBigImage(d) {
       if (t.valid) {
         d.alpha = 0;
         d.alpha2 = 0;
-      }
-      if (zoomedToImage && selectedImage && selectedImage.id === d.id && !state.zoomingToImage) {
-        zoomToImage(d, 300);
       }
     };
 
