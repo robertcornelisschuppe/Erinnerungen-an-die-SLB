@@ -282,7 +282,7 @@ function Canvas() {
           : "";
         iframeHtml =
           '<iframe class="media-iframe" ' +
-          'src="https://www.youtube.com/embed/' + videoId + '?playsinline=1&rel=0&controls=1' + originParam + '" ' +
+          'src="https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=1&playsinline=1&rel=0&controls=1' + originParam + '" ' +
           'frameborder="0" ' +
           'referrerpolicy="strict-origin-when-cross-origin" ' +
           'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" ' +
