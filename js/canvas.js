@@ -1045,6 +1045,9 @@ canvas.resize = function () {
     vizContainer.style("pointer-events", "none");
     zoom.center(null);
 
+    // Untertitel während der Zoom-Animation verstecken
+    d3.select("#caption-overlay").classed("hide", true);
+
     showDetail(d);
     loadMiddleImage(d);
     loadBigImage(d, "click");
@@ -1158,6 +1161,14 @@ canvas.resize = function () {
         state.zoomingToImage = false;
         vizContainer.style("pointer-events", "auto");
         utils.updateHash("ids", d.id, ["translate", "scale"]);
+
+        // Untertitel erst jetzt einblenden und exakt positionieren
+        if (d._description) {
+          d3.select("#caption-overlay")
+            .text(d._description)
+            .classed("hide", false);
+          if (canvas.updateCaptionPosition) canvas.updateCaptionPosition();
+        }
       });
   }
   canvas.zoomToImage = zoomToImage;
