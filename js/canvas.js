@@ -1153,14 +1153,15 @@ canvas.resize = function () {
           sleep = false;
         };
       })
-      .each("end", function () {
+  	  .each("end", function () {
         zoomedToImage = true;
         selectedImage = d;
         hideTheRest(d);
         state.zoomingToImage = false;
         vizContainer.style("pointer-events", "auto");
         utils.updateHash("ids", d.id, ["translate", "scale"]);
-
+        showCaption(d);
+      });
     var overlay = d3.select("#caption-overlay");
     if (d._description && d._description.toString().trim() !== "") {
       overlay.text(d._description);
@@ -1289,16 +1290,17 @@ if (
     zoomedToImageScale = scale;
     hideTheRest(selectedImage);
     showDetail(selectedImage);
+    showCaption(selectedImage);
+  }
 
-    if (selectedImage._description && selectedImage._description.toString().trim() !== "") {
-      var overlay = d3.select("#caption-overlay");
-      overlay
-        .style("visibility", "hidden")
-        .text(selectedImage._description)
-        .classed("hide", false);
-      if (canvas.updateCaptionPosition) canvas.updateCaptionPosition();
-      overlay.style("visibility", "visible");
-    }
+  if (zoomedToImage && zoomedToImageScale * 0.8 > scale) {
+    zoomedToImage = false;
+    state.lastZoomed = 0;
+    selectedImage = null;
+    showAllImages();
+    clearBigImages();
+    detailContainer.classed("hide", true);
+  }
   }
 
   if (scale > zoomBarrier && !zoomBarrierState) {
