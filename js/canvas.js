@@ -288,9 +288,6 @@ function Canvas() {
           'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" ' +
           'allowfullscreen></iframe>';
       }
-      if (videoId) {
-        iframeHtml = '<iframe class="media-iframe" src="https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0&showinfo=0&controls=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
-      }
     } else if (link.includes("soundcloud.com/player/")) {
       iframeHtml = '<iframe class="media-iframe" scrolling="no" frameborder="no" allow="autoplay" src="' + link + '&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true"></iframe>';
     } else if (link.match(/\.(mp4|ogg|webm)$/i)) {
