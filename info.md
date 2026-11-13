@@ -12,7 +12,7 @@ Die Inhalte sind nach Dekaden geordnet. Am unteren Bildrand sind diese vermerkt.
 
 ![time](img/infobar_scroll.svg)
 
-Nutzen Sie das Touchpad oder das Mausrad, um zu zoomen. Klicken Sie auf einzelne Bilder, um das Bild zu maximieren und den dazugehörigen Interviewausschnitt zu starten. Mit der Escape-Tasten gelangen Sie wieder zur Startansicht.
+Nutzen Sie das Touchpad oder das Mausrad, um zu zoomen. Klicken Sie auf einzelne Bilder, um das Bild zu maximieren und den dazugehörigen Interviewausschnitt zu starten. Mit der Escape-Taste gelangen Sie wieder zur Startansicht.
 
 Redaktion: Katrin Nitzschke und Robert C. Schuppe
 Interviews: Stella Philipp, Elena Hansen, Katrin Nitzschke und Robert C. Schuppe
