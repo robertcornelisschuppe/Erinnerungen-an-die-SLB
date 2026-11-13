@@ -524,7 +524,7 @@ svg {
     transform: translate(0px,-18px);
 }
 .tagcloud>div {
-  transition: all 0.3s ease;
+  transition: none !important;
 }
 .tagcloud .tag {
   float: left;
