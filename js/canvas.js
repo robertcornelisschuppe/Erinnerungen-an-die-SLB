@@ -1883,27 +1883,15 @@ function loadBigImage(d) {
       .style("top", finalTop + "px");
   };
 
-var tagcloudShiftX = 0;
-  var tagcloudObserverInitialized = false;
+var tagcloudShiftX = null;
+  var tagcloudObserver = null;
 
   canvas.centerTagcloud = function () {
     var tagcloud = d3.select(".tagcloud");
-    if (tagcloud.empty()) return;
+    if (tagcloud.empty() || tagcloud.classed("hide")) return;
 
     var inner = tagcloud.select("div");
     if (inner.empty()) return;
-
-    if (!tagcloudObserverInitialized && typeof MutationObserver !== "undefined") {
-      tagcloudObserverInitialized = true;
-      var observer = new MutationObserver(function () {
-        requestAnimationFrame(canvas.centerTagcloud);
-      });
-      observer.observe(inner.node(), {
-        subtree: true,
-        attributes: true,
-        attributeFilter: ["style", "class"]
-      });
-    }
 
     var tagNodes = inner.selectAll(".tag")[0];
     if (!tagNodes || !tagNodes.length) return;
@@ -1921,19 +1909,41 @@ var tagcloudShiftX = 0;
 
     if (!isFinite(minLeft) || !isFinite(maxRight)) return;
 
-    var baseMinLeft = minLeft - tagcloudShiftX;
-    var baseMaxRight = maxRight - tagcloudShiftX;
+    var currentShift = tagcloudShiftX || 0;
+    var baseMinLeft = minLeft - currentShift;
+    var baseMaxRight = maxRight - currentShift;
     var contentWidth = baseMaxRight - baseMinLeft;
+    var nextShift = Math.round(((widthOuter - contentWidth) / 2) - baseMinLeft);
 
-    tagcloudShiftX = ((widthOuter - contentWidth) / 2) - baseMinLeft;
-    inner.style("transform", "translateX(" + Math.round(tagcloudShiftX) + "px)");
+    if (nextShift !== tagcloudShiftX) {
+      tagcloudShiftX = nextShift;
+      if (tagcloudObserver) tagcloudObserver.disconnect();
+      inner.style("transform", "translateX(" + tagcloudShiftX + "px)");
+      if (tagcloudObserver) {
+        tagcloudObserver.observe(inner.node(), {
+          subtree: true,
+          attributes: true,
+          attributeFilter: ["style", "class"]
+        });
+      }
+    }
+
+    if (!tagcloudObserver && typeof MutationObserver !== "undefined") {
+      tagcloudObserver = new MutationObserver(function () {
+        requestAnimationFrame(canvas.centerTagcloud);
+      });
+      tagcloudObserver.observe(inner.node(), {
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["style", "class"]
+      });
+    }
   };
 
   setTimeout(function () {
     if (typeof canvas.centerTagcloud === "function") {
       canvas.centerTagcloud();
     }
-  }, 100);  
-
+  }, 100);
   return canvas;
 }
