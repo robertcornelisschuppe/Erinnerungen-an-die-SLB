@@ -1310,6 +1310,9 @@ if (
     d3.select(".tagcloud, .crossfilter").classed("hide", false);
     d3.select(".vorbesitzerinOuter").classed("hide", false);
     d3.select(".searchbar").classed("hide", false);
+    if (typeof canvas.centerTagcloud === "function") {
+      canvas.centerTagcloud();
+    }
   }
 
   stage2.scale.x = d3.event.scale;
@@ -1569,6 +1572,9 @@ canvas.resetZoom = function (callback) {
 
     d3.select(".sidebar").classed("sneak", true);
     d3.select(".tagcloud").classed("hide", false);
+    if (typeof canvas.centerTagcloud === "function") {
+      canvas.centerTagcloud();
+    }
 
     zoomedToImage = false;
     selectedImage = null;
@@ -1889,44 +1895,54 @@ function loadBigImage(d) {
       .style("top", finalTop + "px");
   };
 
-var tagcloudShiftX = null;
+  var tagcloudShiftX = null;
   var tagcloudObserver = null;
+  var tagcloudSettleTimer = null;
 
   canvas.centerTagcloud = function () {
     var tagcloud = d3.select(".tagcloud");
-    if (tagcloud.empty() || tagcloud.classed("hide")) return;
+    if (tagcloud.empty()) return;
 
     var inner = tagcloud.select("div");
     if (inner.empty()) return;
 
+    var innerNode = inner.node();
     var tagNodes = inner.selectAll(".tag")[0];
     if (!tagNodes || !tagNodes.length) return;
 
-    var minLeft = Infinity;
-    var maxRight = -Infinity;
+    // Eigene Transition auf dem Wrapper deaktivieren, damit keine Verzögerung entsteht
+    inner
+      .style("position", "relative")
+      .style("transition", "none");
+
+    var innerRect = innerNode.getBoundingClientRect();
+    var minRelLeft = Infinity;
+    var maxRelRight = -Infinity;
 
     tagNodes.forEach(function (el) {
       var rect = el.getBoundingClientRect();
       if (rect.width > 0) {
-        if (rect.left < minLeft) minLeft = rect.left;
-        if (rect.right > maxRight) maxRight = rect.right;
+        var relLeft = rect.left - innerRect.left;
+        var relRight = rect.right - innerRect.left;
+        if (relLeft < minRelLeft) minRelLeft = relLeft;
+        if (relRight > maxRelRight) maxRelRight = relRight;
       }
     });
 
-    if (!isFinite(minLeft) || !isFinite(maxRight)) return;
+    if (!isFinite(minRelLeft) || !isFinite(maxRelRight)) return;
 
-    var currentShift = tagcloudShiftX || 0;
-    var baseMinLeft = minLeft - currentShift;
-    var baseMaxRight = maxRight - currentShift;
-    var contentWidth = baseMaxRight - baseMinLeft;
-    var nextShift = Math.round(((widthOuter - contentWidth) / 2) - baseMinLeft);
+    var viewportWidth = window.innerWidth || widthOuter;
+    var contentWidth = maxRelRight - minRelLeft;
+    var nextShift = Math.round(((viewportWidth - contentWidth) / 2) - minRelLeft);
 
     if (nextShift !== tagcloudShiftX) {
       tagcloudShiftX = nextShift;
       if (tagcloudObserver) tagcloudObserver.disconnect();
-      inner.style("transform", "translateX(" + tagcloudShiftX + "px)");
+      inner
+        .style("transform", "none")
+        .style("left", tagcloudShiftX + "px");
       if (tagcloudObserver) {
-        tagcloudObserver.observe(inner.node(), {
+        tagcloudObserver.observe(innerNode, {
           subtree: true,
           attributes: true,
           attributeFilter: ["style", "class"]
@@ -1937,11 +1953,18 @@ var tagcloudShiftX = null;
     if (!tagcloudObserver && typeof MutationObserver !== "undefined") {
       tagcloudObserver = new MutationObserver(function () {
         requestAnimationFrame(canvas.centerTagcloud);
+        clearTimeout(tagcloudSettleTimer);
+        // Nach Ende der 300ms CSS-Transition der einzelnen Tags erneut exakt ausrichten
+        tagcloudSettleTimer = setTimeout(canvas.centerTagcloud, 320);
       });
-      tagcloudObserver.observe(inner.node(), {
+      tagcloudObserver.observe(innerNode, {
         subtree: true,
         attributes: true,
         attributeFilter: ["style", "class"]
+      });
+
+      innerNode.addEventListener("transitionend", function () {
+        requestAnimationFrame(canvas.centerTagcloud);
       });
     }
   };
@@ -1951,5 +1974,11 @@ var tagcloudShiftX = null;
       canvas.centerTagcloud();
     }
   }, 100);
+  setTimeout(function () {
+    if (typeof canvas.centerTagcloud === "function") {
+      canvas.centerTagcloud();
+    }
+  }, 450);
+
   return canvas;
 }
