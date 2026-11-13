@@ -625,6 +625,9 @@ canvas.resize = function () {
     if (typeof tags.update === "function") {
       tags.update();
     }
+    if (typeof canvas.centerTagcloud === "function") {
+      canvas.centerTagcloud();
+    }
   }
 
   sleep = false;
@@ -1250,15 +1253,10 @@ function zoomed() {
     x2 = x1 + width / scale;
   }
 
-  // 1. Synchronisation der Zeitleiste
   if (typeof timeline !== "undefined" && typeof timeline.update === "function") {
     timeline.update(x1, x2, scale, translate, scale1);
   }
 
-  // 2. Synchronisation der Schlagwörter (Tagcloud)
-  if (typeof tags !== "undefined" && typeof tags.update === "function") {
-    tags.update(x1, x2, scale, translate, scale1);
-  }
 
 if (
     zoomedToImageScale != 0 &&
@@ -1876,6 +1874,58 @@ function loadBigImage(d) {
       .style("left", clampX + "px")
       .style("top", finalTop + "px");
   };
+
+var tagcloudShiftX = 0;
+  var tagcloudObserverInitialized = false;
+
+  canvas.centerTagcloud = function () {
+    var tagcloud = d3.select(".tagcloud");
+    if (tagcloud.empty()) return;
+
+    var inner = tagcloud.select("div");
+    if (inner.empty()) return;
+
+    if (!tagcloudObserverInitialized && typeof MutationObserver !== "undefined") {
+      tagcloudObserverInitialized = true;
+      var observer = new MutationObserver(function () {
+        requestAnimationFrame(canvas.centerTagcloud);
+      });
+      observer.observe(inner.node(), {
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["style", "class"]
+      });
+    }
+
+    var tagNodes = inner.selectAll(".tag")[0];
+    if (!tagNodes || !tagNodes.length) return;
+
+    var minLeft = Infinity;
+    var maxRight = -Infinity;
+
+    tagNodes.forEach(function (el) {
+      var rect = el.getBoundingClientRect();
+      if (rect.width > 0) {
+        if (rect.left < minLeft) minLeft = rect.left;
+        if (rect.right > maxRight) maxRight = rect.right;
+      }
+    });
+
+    if (!isFinite(minLeft) || !isFinite(maxRight)) return;
+
+    var baseMinLeft = minLeft - tagcloudShiftX;
+    var baseMaxRight = maxRight - tagcloudShiftX;
+    var contentWidth = baseMaxRight - baseMinLeft;
+
+    tagcloudShiftX = ((widthOuter - contentWidth) / 2) - baseMinLeft;
+    inner.style("transform", "translateX(" + Math.round(tagcloudShiftX) + "px)");
+  };
+
+  setTimeout(function () {
+    if (typeof canvas.centerTagcloud === "function") {
+      canvas.centerTagcloud();
+    }
+  }, 100);  
 
   return canvas;
 }
