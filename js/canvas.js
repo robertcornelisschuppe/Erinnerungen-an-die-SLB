@@ -1770,16 +1770,11 @@ function loadBigImage(d) {
     d.big = true;
     stage5.addChild(sprite);
 
-    // HTML Caption Overlay steuern
-    if (d._description) {
-      d3.select("#caption-overlay")
-        .text(d._description)
-        .classed("hide", false);
-      canvas.updateCaptionPosition();
+    // Untertitel erst einblenden, wenn der Zoom abgeschlossen ist
+    if (zoomedToImage && !state.zoomingToImage) {
+      showCaption(d);
     } else {
-      d3.select("#caption-overlay")
-        .text("")
-        .classed("hide", true);
+      hideCaption();
     }
 
     sleep = false;
@@ -1792,7 +1787,7 @@ function loadBigImage(d) {
       }
       stage5.removeChild(stage5.children[0]);
     }
-    d3.select("#caption-overlay").classed("hide", true);
+    hideCaption();
     showAllImages();
     sleep = false;
   }
@@ -1809,7 +1804,36 @@ function loadBigImage(d) {
     }
   }
 
-canvas.updateCaptionPosition = function () {
+  function hideCaption() {
+    d3.select("#caption-overlay")
+      .classed("hide", true)
+      .style("display", "none");
+  }
+
+  function showCaption(d) {
+    var overlay = d3.select("#caption-overlay");
+    if (
+      !d ||
+      !d._description ||
+      d._description.toString().trim() === "" ||
+      !zoomedToImage ||
+      state.zoomingToImage
+    ) {
+      hideCaption();
+      return;
+    }
+
+    overlay
+      .text(d._description)
+      .style("visibility", "hidden")
+      .style("display", "block")
+      .classed("hide", false);
+
+    canvas.updateCaptionPosition();
+    overlay.style("visibility", "visible");
+  }
+
+  canvas.updateCaptionPosition = function () {
     var overlay = d3.select("#caption-overlay");
     if (overlay.classed("hide") || !selectedImage || !zoomedToImage || state.zoomingToImage) return;
 
